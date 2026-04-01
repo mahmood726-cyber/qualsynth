@@ -1,0 +1,2095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QualSynth - Qualitative Evidence Synthesis</title>
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+:root {
+  --primary: #0f766e;
+  --primary-light: #14b8a6;
+  --primary-dark: #0d6059;
+  --bg: #ffffff;
+  --bg-alt: #f8fafc;
+  --bg-card: #ffffff;
+  --text: #1e293b;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --shadow: 0 1px 3px rgba(0,0,0,0.1);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.08);
+  --radius: 8px;
+  --high: #16a34a;
+  --moderate: #eab308;
+  --low: #f97316;
+  --very-low: #ef4444;
+  --gradient-start: #0f766e;
+  --gradient-end: #0d9488;
+  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+body.dark {
+  --bg: #0f172a;
+  --bg-alt: #1e293b;
+  --bg-card: #1e293b;
+  --text: #e2e8f0;
+  --text-muted: #94a3b8;
+  --border: #334155;
+  --shadow: 0 1px 3px rgba(0,0,0,0.4);
+  --shadow-lg: 0 4px 12px rgba(0,0,0,0.3);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+/* Header */
+.app-header {
+  background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+  color: #fff;
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-lg);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.app-header h1 { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.01em; }
+.app-header .subtitle { font-size: 0.85rem; opacity: 0.85; margin-left: 12px; }
+.header-actions { display: flex; gap: 10px; align-items: center; }
+.btn {
+  padding: 7px 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-family: var(--font);
+  transition: all 0.15s;
+}
+.btn:hover { box-shadow: var(--shadow); }
+.btn:focus-visible { outline: 2px solid var(--primary-light); outline-offset: 2px; }
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+}
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-sm { padding: 4px 10px; font-size: 0.8rem; }
+.btn-danger { background: #ef4444; color: #fff; border-color: #ef4444; }
+.btn-danger:hover { background: #dc2626; }
+/* Dark mode toggle */
+.dark-toggle {
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: #fff;
+  border-radius: 20px;
+  padding: 5px 14px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+/* Tabs */
+.tab-bar {
+  display: flex;
+  background: var(--bg-alt);
+  border-bottom: 2px solid var(--border);
+  padding: 0 24px;
+  overflow-x: auto;
+}
+.tab-btn {
+  padding: 12px 20px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-family: var(--font);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.tab-btn:hover { color: var(--text); background: var(--bg-card); }
+.tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  font-weight: 600;
+}
+.tab-btn:focus-visible { outline: 2px solid var(--primary-light); outline-offset: -2px; }
+.tab-panel { display: none; padding: 24px 32px; max-width: 1400px; margin: 0 auto; }
+.tab-panel.active { display: block; }
+/* Cards */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow);
+}
+.card h3 { font-size: 1.1rem; margin-bottom: 12px; color: var(--text); }
+/* Form elements */
+label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: var(--text); }
+input[type="text"], input[type="number"], textarea, select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+}
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 3px rgba(20,184,166,0.15);
+}
+textarea { resize: vertical; min-height: 80px; }
+/* Tables */
+table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+th, td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+th { font-weight: 600; background: var(--bg-alt); color: var(--text); position: sticky; top: 0; }
+tr:hover { background: var(--bg-alt); }
+/* Badges */
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+.badge-high { background: #dcfce7; color: #166534; }
+.badge-moderate { background: #fef9c3; color: #854d0e; }
+.badge-low { background: #ffedd5; color: #9a3412; }
+.badge-very-low { background: #fee2e2; color: #991b1b; }
+body.dark .badge-high { background: #166534; color: #dcfce7; }
+body.dark .badge-moderate { background: #854d0e; color: #fef9c3; }
+body.dark .badge-low { background: #9a3412; color: #ffedd5; }
+body.dark .badge-very-low { background: #991b1b; color: #fee2e2; }
+/* Grid layouts */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+@media (max-width: 900px) {
+  .grid-2, .grid-3 { grid-template-columns: 1fr; }
+}
+/* Coding panel */
+.coding-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; min-height: 500px; }
+.quote-list { max-height: 600px; overflow-y: auto; }
+.quote-item {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.15s;
+  background: var(--bg-card);
+}
+.quote-item:hover { border-color: var(--primary-light); box-shadow: var(--shadow); }
+.quote-item.selected { border-color: var(--primary); background: rgba(15,118,110,0.05); }
+.quote-text { font-style: italic; margin-bottom: 6px; }
+.quote-meta { font-size: 0.8rem; color: var(--text-muted); }
+.theme-card {
+  padding: 14px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  background: var(--bg-card);
+  transition: all 0.15s;
+}
+.theme-card:hover { border-color: var(--primary-light); }
+.theme-card.analytical { border-left: 4px solid var(--primary); }
+.theme-card .theme-label { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+.theme-card .theme-desc { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 6px; }
+.theme-card .theme-stats { font-size: 0.8rem; color: var(--text-muted); }
+/* Translation matrix */
+.matrix-cell {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+.cell-present { background: #dcfce7; color: #166534; }
+.cell-absent { background: #f1f5f9; color: #94a3b8; }
+.cell-refutational { background: #fee2e2; color: #991b1b; }
+.cell-partial { background: #fef9c3; color: #854d0e; }
+body.dark .cell-present { background: #166534; color: #dcfce7; }
+body.dark .cell-absent { background: #334155; color: #64748b; }
+body.dark .cell-refutational { background: #991b1b; color: #fee2e2; }
+body.dark .cell-partial { background: #854d0e; color: #fef9c3; }
+/* CERQual form */
+.cerqual-row { display: grid; grid-template-columns: 2fr repeat(4, 1fr) auto; gap: 10px; align-items: start; margin-bottom: 16px; padding: 14px; border: 1px solid var(--border); border-radius: var(--radius); }
+.cerqual-finding-text { font-size: 0.88rem; line-height: 1.5; }
+/* Charts */
+.chart-container { width: 100%; min-height: 400px; margin: 16px 0; }
+/* SoQF Table */
+.soqf-table th { text-align: center; }
+.soqf-table td:nth-child(2), .soqf-table td:nth-child(3) { text-align: center; }
+/* Utility */
+.mt-1 { margin-top: 8px; }
+.mt-2 { margin-top: 16px; }
+.mb-1 { margin-bottom: 8px; }
+.mb-2 { margin-bottom: 16px; }
+.flex-between { display: flex; justify-content: space-between; align-items: center; }
+.text-muted { color: var(--text-muted); }
+.text-sm { font-size: 0.85rem; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+/* Status bar */
+.status-bar {
+  background: var(--bg-alt);
+  border-top: 1px solid var(--border);
+  padding: 8px 32px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+}
+.main-content { padding-bottom: 40px; }
+/* Example selector */
+.example-bar {
+  display: flex;
+  gap: 10px;
+  padding: 12px 32px;
+  background: var(--bg-alt);
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+}
+.example-bar span { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+/* Modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.active { display: flex; }
+.modal {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 24px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+}
+.modal h2 { margin-bottom: 16px; font-size: 1.2rem; }
+</style>
+</head>
+<body>
+<!-- Header -->
+<header class="app-header" role="banner">
+  <div style="display:flex;align-items:baseline;">
+    <h1>QualSynth</h1>
+    <span class="subtitle">Qualitative Evidence Synthesis</span>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-sm" onclick="importJSON()" aria-label="Import JSON data">Import JSON</button>
+    <button class="btn btn-sm btn-primary" onclick="exportTruthCert()" aria-label="Export TruthCert bundle">Export TruthCert</button>
+    <button class="dark-toggle" onclick="toggleDarkMode()" aria-label="Toggle dark mode">Dark Mode</button>
+  </div>
+</header>
+
+<!-- Example bar -->
+<div class="example-bar" role="toolbar" aria-label="Example datasets">
+  <span>Load Example:</span>
+  <button class="btn btn-sm" onclick="loadExample('diabetes')">T2DM Self-Management (5 studies)</button>
+  <button class="btn btn-sm" onclick="loadExample('burnout')">HCW Burnout COVID-19 (4 studies)</button>
+  <button class="btn btn-sm btn-danger" onclick="clearAll()">Clear All</button>
+</div>
+
+<!-- Tab bar -->
+<nav class="tab-bar" role="tablist" aria-label="Main navigation">
+  <button class="tab-btn active" role="tab" aria-selected="true" aria-controls="panel-studies" id="tab-studies" onclick="switchTab('studies')">Studies</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-coding" id="tab-coding" onclick="switchTab('coding')">Coding</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-translation" id="tab-translation" onclick="switchTab('translation')">Translation</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-synthesis" id="tab-synthesis" onclick="switchTab('synthesis')">Synthesis</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-cerqual" id="tab-cerqual" onclick="switchTab('cerqual')">CERQual</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-report" id="tab-report" onclick="switchTab('report')">Report</button>
+</nav>
+
+<main class="main-content">
+<!-- ===== TAB 1: STUDIES ===== -->
+<div class="tab-panel active" id="panel-studies" role="tabpanel" aria-labelledby="tab-studies">
+  <div class="grid-2">
+    <!-- Add study form -->
+    <div class="card">
+      <h3>Add Study</h3>
+      <label for="study-id">Study ID (e.g. Smith2020)</label>
+      <input type="text" id="study-id" placeholder="Author+Year">
+
+      <label for="study-title">Title</label>
+      <input type="text" id="study-title" placeholder="Full title">
+
+      <label for="study-authors">Authors</label>
+      <input type="text" id="study-authors" placeholder="Author et al.">
+
+      <label for="study-year">Year</label>
+      <input type="number" id="study-year" min="1900" max="2100" value="2024">
+
+      <label for="study-methodology">Methodology</label>
+      <select id="study-methodology">
+        <option value="phenomenology">Phenomenology</option>
+        <option value="grounded_theory">Grounded Theory</option>
+        <option value="ethnography">Ethnography</option>
+        <option value="case_study">Case Study</option>
+        <option value="other">Other</option>
+      </select>
+
+      <label for="study-setting">Setting</label>
+      <input type="text" id="study-setting" placeholder="e.g. UK primary care">
+
+      <label for="study-participants">Participants</label>
+      <input type="text" id="study-participants" placeholder="e.g. 20 adults with T2DM">
+
+      <label for="study-sample-size">Sample Size</label>
+      <input type="number" id="study-sample-size" min="1" value="10">
+
+      <label for="study-quality-tool">Quality Tool</label>
+      <select id="study-quality-tool">
+        <option value="CASP">CASP</option>
+        <option value="JBI">JBI</option>
+        <option value="other">Other</option>
+      </select>
+
+      <label for="study-quality-score">Quality Score</label>
+      <select id="study-quality-score">
+        <option value="high">High</option>
+        <option value="moderate">Moderate</option>
+        <option value="low">Low</option>
+      </select>
+
+      <label for="study-findings">Key Findings (one per line)</label>
+      <textarea id="study-findings" rows="3" placeholder="Enter key findings, one per line"></textarea>
+
+      <label for="study-quotes">Quotes (format: QuoteID | Text | ParticipantID | Page | Context -- one per line)</label>
+      <textarea id="study-quotes" rows="3" placeholder="Q1 | Quote text here | P01 | p.5 | Context"></textarea>
+
+      <button class="btn btn-primary mt-1" onclick="addStudy()">Add Study</button>
+    </div>
+
+    <!-- Study list -->
+    <div class="card">
+      <h3 id="study-list-heading">Studies (<span id="study-count">0</span>)</h3>
+      <div id="study-table-container" role="region" aria-labelledby="study-list-heading">
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Year</th><th>Method</th><th>N</th><th>Quality</th><th>Quotes</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="study-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB 2: CODING ===== -->
+<div class="tab-panel" id="panel-coding" role="tabpanel" aria-labelledby="tab-coding">
+  <div class="flex-between mb-2">
+    <h3>Theme Coding</h3>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-sm" onclick="openCreateThemeModal()">+ New Theme</button>
+      <button class="btn btn-sm" onclick="openMergeThemeModal()">Merge Themes</button>
+    </div>
+  </div>
+  <div class="coding-layout">
+    <!-- Quotes panel -->
+    <div>
+      <div class="flex-between mb-1">
+        <label for="coding-study-filter">Filter by Study:</label>
+        <select id="coding-study-filter" onchange="renderCodingQuotes()" style="width:auto;margin-bottom:0;">
+          <option value="all">All Studies</option>
+        </select>
+      </div>
+      <div class="quote-list" id="coding-quotes-list" role="listbox" aria-label="Quotes to code"></div>
+    </div>
+    <!-- Themes panel -->
+    <div>
+      <div id="coding-themes-list" role="list" aria-label="Themes"></div>
+      <div class="card mt-2" id="coding-selected-info" style="display:none;">
+        <p class="text-sm text-muted">Select a quote on the left, then click a theme to assign it.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB 3: TRANSLATION ===== -->
+<div class="tab-panel" id="panel-translation" role="tabpanel" aria-labelledby="tab-translation">
+  <div class="flex-between mb-2">
+    <h3>Translation Matrix (Meta-Ethnography)</h3>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-sm" onclick="openAddConceptModal()">+ Add Concept</button>
+      <button class="btn btn-sm btn-primary" onclick="autoDetectConcepts()">Auto-Detect</button>
+    </div>
+  </div>
+  <div class="card" id="translation-matrix-card">
+    <div id="translation-matrix-container" role="grid" aria-label="Translation matrix">
+      <p class="text-muted">Add concepts and studies to build the translation matrix.</p>
+    </div>
+  </div>
+  <div class="grid-2 mt-2">
+    <div class="card">
+      <h3>Translation Analysis</h3>
+      <div id="translation-analysis"></div>
+    </div>
+    <div class="card">
+      <h3>Study-Theme Matrix</h3>
+      <div class="chart-container" id="chart-study-theme"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TAB 4: SYNTHESIS ===== -->
+<div class="tab-panel" id="panel-synthesis" role="tabpanel" aria-labelledby="tab-synthesis">
+  <div class="flex-between mb-2">
+    <h3>Synthesis</h3>
+    <select id="synthesis-type" onchange="renderSynthesis()" style="width:auto;margin-bottom:0;">
+      <option value="thematic_synthesis">Thematic Synthesis</option>
+      <option value="meta_ethnography">Meta-Ethnography</option>
+    </select>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Theme Summary</h3>
+      <div id="theme-summary-content"></div>
+    </div>
+    <div class="card">
+      <h3>Line of Argument</h3>
+      <textarea id="line-of-argument" rows="6" placeholder="Write the overarching narrative that synthesises the translated concepts..."></textarea>
+    </div>
+  </div>
+  <div class="card mt-2">
+    <h3>Theme Network</h3>
+    <div class="chart-container" id="chart-theme-network"></div>
+  </div>
+</div>
+
+<!-- ===== TAB 5: CERQual ===== -->
+<div class="tab-panel" id="panel-cerqual" role="tabpanel" aria-labelledby="tab-cerqual">
+  <div class="flex-between mb-2">
+    <h3>CERQual Assessment</h3>
+    <button class="btn btn-sm" onclick="openAddFindingModal()">+ Add Finding</button>
+  </div>
+  <div id="cerqual-findings-container"></div>
+  <div class="card mt-2">
+    <h3>CERQual Traffic Light</h3>
+    <div class="chart-container" id="chart-cerqual-traffic"></div>
+  </div>
+</div>
+
+<!-- ===== TAB 6: REPORT ===== -->
+<div class="tab-panel" id="panel-report" role="tabpanel" aria-labelledby="tab-report">
+  <div class="flex-between mb-2">
+    <h3>Report</h3>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-sm" onclick="copyReportToClipboard()">Copy to Clipboard</button>
+      <button class="btn btn-sm btn-primary" onclick="exportTruthCert()">Export TruthCert JSON</button>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Summary of Qualitative Findings (SoQF) Table</h3>
+    <div id="soqf-table-container"></div>
+  </div>
+  <div class="card mt-2">
+    <h3>Methods Paragraph</h3>
+    <div id="methods-paragraph"></div>
+  </div>
+  <div class="card mt-2">
+    <h3>Theme Descriptions</h3>
+    <div id="theme-descriptions"></div>
+  </div>
+  <div class="card mt-2">
+    <h3>CERQual Justification</h3>
+    <div id="cerqual-justification"></div>
+  </div>
+</div>
+</main>
+
+<!-- Status bar -->
+<div class="status-bar" role="status" aria-live="polite">
+  <span id="status-text">Ready</span>
+  <span id="status-cert"></span>
+</div>
+
+<!-- Modals -->
+<div class="modal-overlay" id="modal-create-theme" role="dialog" aria-modal="true" aria-label="Create theme">
+  <div class="modal">
+    <h2>Create Theme</h2>
+    <label for="new-theme-id">Theme ID</label>
+    <input type="text" id="new-theme-id" placeholder="T1">
+    <label for="new-theme-label">Label</label>
+    <input type="text" id="new-theme-label" placeholder="Theme name">
+    <label for="new-theme-desc">Description</label>
+    <textarea id="new-theme-desc" rows="2" placeholder="Theme description"></textarea>
+    <label for="new-theme-level">Level</label>
+    <select id="new-theme-level">
+      <option value="descriptive">Descriptive</option>
+      <option value="analytical">Analytical</option>
+    </select>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button class="btn btn-primary" onclick="createThemeFromModal()">Create</button>
+      <button class="btn" onclick="closeModal('modal-create-theme')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-merge-theme" role="dialog" aria-modal="true" aria-label="Merge themes">
+  <div class="modal">
+    <h2>Merge Themes</h2>
+    <label for="merge-theme-id">New Theme ID</label>
+    <input type="text" id="merge-theme-id" placeholder="TM1">
+    <label for="merge-theme-label">New Label</label>
+    <input type="text" id="merge-theme-label" placeholder="Merged theme name">
+    <label>Select themes to merge:</label>
+    <div id="merge-theme-checkboxes"></div>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button class="btn btn-primary" onclick="mergeThemesFromModal()">Merge</button>
+      <button class="btn" onclick="closeModal('modal-merge-theme')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-add-concept" role="dialog" aria-modal="true" aria-label="Add concept">
+  <div class="modal">
+    <h2>Add Concept</h2>
+    <label for="new-concept-name">Concept Name</label>
+    <input type="text" id="new-concept-name" placeholder="e.g. moral_distress">
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button class="btn btn-primary" onclick="addConceptFromModal()">Add</button>
+      <button class="btn" onclick="closeModal('modal-add-concept')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-add-finding" role="dialog" aria-modal="true" aria-label="Add finding">
+  <div class="modal">
+    <h2>Add CERQual Finding</h2>
+    <label for="new-finding-id">Finding ID</label>
+    <input type="text" id="new-finding-id" placeholder="F1">
+    <label for="new-finding-text">Finding Text</label>
+    <textarea id="new-finding-text" rows="3" placeholder="State the review finding"></textarea>
+    <label>Contributing Studies:</label>
+    <div id="finding-study-checkboxes"></div>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button class="btn btn-primary" onclick="addFindingFromModal()">Add</button>
+      <button class="btn" onclick="closeModal('modal-add-finding')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden file input -->
+<input type="file" id="import-file-input" accept=".json" style="display:none" onchange="handleImportFile(event)">
+
+<script>
+/* ============================================================
+   QualSynth Browser Engine
+   All Python logic ported to JavaScript
+   ============================================================ */
+
+// ---- STATE ----
+var appState = {
+  studies: [],
+  themes: [],
+  concepts: [],
+  cerqualFindings: [],
+  translationMatrix: null,
+  selectedQuote: null,
+  synthesisType: 'thematic_synthesis'
+};
+
+// ---- DARK MODE ----
+function toggleDarkMode() {
+  document.body.classList.toggle('dark');
+  var isDark = document.body.classList.contains('dark');
+  localStorage.setItem('qualsynth_dark', isDark ? '1' : '0');
+  replotAll();
+}
+(function initDark() {
+  if (localStorage.getItem('qualsynth_dark') === '1') {
+    document.body.classList.add('dark');
+  }
+})();
+
+// ---- TAB SWITCHING ----
+function switchTab(tabName) {
+  var panels = document.querySelectorAll('.tab-panel');
+  var btns = document.querySelectorAll('.tab-btn');
+  for (var i = 0; i < panels.length; i++) {
+    panels[i].classList.remove('active');
+    btns[i].classList.remove('active');
+    btns[i].setAttribute('aria-selected', 'false');
+  }
+  document.getElementById('panel-' + tabName).classList.add('active');
+  document.getElementById('tab-' + tabName).classList.add('active');
+  document.getElementById('tab-' + tabName).setAttribute('aria-selected', 'true');
+
+  if (tabName === 'coding') { renderCodingPanel(); }
+  if (tabName === 'translation') { renderTranslationMatrix(); renderStudyThemeChart(); }
+  if (tabName === 'synthesis') { renderSynthesis(); renderThemeNetworkChart(); }
+  if (tabName === 'cerqual') { renderCerqualPanel(); renderCerqualTrafficLight(); }
+  if (tabName === 'report') { renderReport(); }
+}
+
+// ---- MODAL HELPERS ----
+function openModal(id) {
+  document.getElementById(id).classList.add('active');
+}
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+// ---- STUDY CRUD ----
+function addStudy() {
+  var sid = document.getElementById('study-id').value.trim();
+  var title = document.getElementById('study-title').value.trim();
+  var authors = document.getElementById('study-authors').value.trim();
+  var year = parseInt(document.getElementById('study-year').value) || 2024;
+  var methodology = document.getElementById('study-methodology').value;
+  var setting = document.getElementById('study-setting').value.trim();
+  var participants = document.getElementById('study-participants').value.trim();
+  var sampleSize = parseInt(document.getElementById('study-sample-size').value) || 0;
+  var qualityTool = document.getElementById('study-quality-tool').value;
+  var qualityScore = document.getElementById('study-quality-score').value;
+  var findingsRaw = document.getElementById('study-findings').value.trim();
+  var quotesRaw = document.getElementById('study-quotes').value.trim();
+
+  if (!sid || !title) { alert('Study ID and Title are required.'); return; }
+  if (appState.studies.some(function(s) { return s.study_id === sid; })) {
+    alert('Study ID already exists.'); return;
+  }
+
+  var keyFindings = findingsRaw ? findingsRaw.split('\n').filter(function(l) { return l.trim(); }) : [];
+  var quotes = [];
+  if (quotesRaw) {
+    quotesRaw.split('\n').forEach(function(line) {
+      var parts = line.split('|').map(function(p) { return p.trim(); });
+      if (parts.length >= 2) {
+        quotes.push({
+          quote_id: parts[0] || ('Q' + Date.now()),
+          text: parts[1] || '',
+          participant_id: parts[2] || '',
+          page: parts[3] || '',
+          context: parts[4] || ''
+        });
+      }
+    });
+  }
+
+  appState.studies.push({
+    study_id: sid,
+    title: title,
+    authors: authors,
+    year: year,
+    methodology: methodology,
+    setting: setting,
+    participants: participants,
+    sample_size: sampleSize,
+    key_findings: keyFindings,
+    quotes: quotes,
+    quality_tool: qualityTool,
+    quality_score: qualityScore
+  });
+
+  clearStudyForm();
+  renderStudyTable();
+  updateStatus('Added study: ' + sid);
+}
+
+function clearStudyForm() {
+  document.getElementById('study-id').value = '';
+  document.getElementById('study-title').value = '';
+  document.getElementById('study-authors').value = '';
+  document.getElementById('study-year').value = '2024';
+  document.getElementById('study-setting').value = '';
+  document.getElementById('study-participants').value = '';
+  document.getElementById('study-sample-size').value = '10';
+  document.getElementById('study-findings').value = '';
+  document.getElementById('study-quotes').value = '';
+}
+
+function removeStudy(sid) {
+  appState.studies = appState.studies.filter(function(s) { return s.study_id !== sid; });
+  renderStudyTable();
+  updateStatus('Removed study: ' + sid);
+}
+
+function renderStudyTable() {
+  var tbody = document.getElementById('study-tbody');
+  document.getElementById('study-count').textContent = appState.studies.length;
+  var html = '';
+  appState.studies.forEach(function(s) {
+    html += '<tr>';
+    html += '<td><strong>' + escapeHtml(s.study_id) + '</strong><br><span class="text-sm text-muted">' + escapeHtml(s.title.substring(0, 50)) + '</span></td>';
+    html += '<td>' + s.year + '</td>';
+    html += '<td>' + escapeHtml(s.methodology) + '</td>';
+    html += '<td>' + s.sample_size + '</td>';
+    html += '<td><span class="badge badge-' + (s.quality_score === 'high' ? 'high' : s.quality_score === 'moderate' ? 'moderate' : 'low') + '">' + escapeHtml(s.quality_score) + '</span></td>';
+    html += '<td>' + s.quotes.length + '</td>';
+    html += '<td><button class="btn btn-sm btn-danger" onclick="removeStudy(\'' + escapeHtml(s.study_id) + '\')">Remove</button></td>';
+    html += '</tr>';
+  });
+  tbody.innerHTML = html;
+}
+
+// ---- THEME ENGINE (ported from Python) ----
+function createTheme(themeId, label, description, level, parentId) {
+  return {
+    theme_id: themeId,
+    label: label || '',
+    description: description || '',
+    level: level || 'descriptive',
+    parent_id: parentId || null,
+    assigned_quotes: [],
+    assigned_studies: [],
+    concepts: []
+  };
+}
+
+function assignQuoteToTheme(themeIndex, quoteId, studyId) {
+  var theme = appState.themes[themeIndex];
+  if (theme.assigned_quotes.indexOf(quoteId) === -1) {
+    theme.assigned_quotes.push(quoteId);
+  }
+  if (theme.assigned_studies.indexOf(studyId) === -1) {
+    theme.assigned_studies.push(studyId);
+  }
+}
+
+function unassignQuoteFromTheme(themeIndex, quoteId) {
+  var theme = appState.themes[themeIndex];
+  theme.assigned_quotes = theme.assigned_quotes.filter(function(q) { return q !== quoteId; });
+  // Recalculate assigned_studies
+  var allStudies = [];
+  theme.assigned_quotes.forEach(function(qid) {
+    appState.studies.forEach(function(s) {
+      s.quotes.forEach(function(q) {
+        if (q.quote_id === qid && allStudies.indexOf(s.study_id) === -1) {
+          allStudies.push(s.study_id);
+        }
+      });
+    });
+  });
+  theme.assigned_studies = allStudies;
+}
+
+function mergeThemesEngine(newId, newLabel, themeIndices) {
+  var allQuotes = [];
+  var allStudies = [];
+  var allConcepts = [];
+  themeIndices.forEach(function(idx) {
+    var t = appState.themes[idx];
+    t.assigned_quotes.forEach(function(q) { if (allQuotes.indexOf(q) === -1) allQuotes.push(q); });
+    t.assigned_studies.forEach(function(s) { if (allStudies.indexOf(s) === -1) allStudies.push(s); });
+    t.concepts.forEach(function(c) { if (allConcepts.indexOf(c) === -1) allConcepts.push(c); });
+  });
+  return {
+    theme_id: newId,
+    label: newLabel,
+    description: '',
+    level: 'descriptive',
+    parent_id: null,
+    assigned_quotes: allQuotes,
+    assigned_studies: allStudies,
+    concepts: allConcepts
+  };
+}
+
+function computeSaturation(theme, nTotalStudies) {
+  if (nTotalStudies <= 0) return 0;
+  return theme.assigned_studies.length / nTotalStudies;
+}
+
+function buildThemeStats() {
+  var nStudies = appState.studies.length;
+  return appState.themes.map(function(t) {
+    return {
+      theme_id: t.theme_id,
+      label: t.label,
+      level: t.level,
+      n_quotes: t.assigned_quotes.length,
+      n_studies: t.assigned_studies.length,
+      saturation: nStudies > 0 ? Math.round((t.assigned_studies.length / nStudies) * 100) / 100 : 0
+    };
+  });
+}
+
+// ---- TRANSLATION ENGINE (ported from Python) ----
+function buildTranslationMatrix() {
+  var studyIds = appState.studies.map(function(s) { return s.study_id; });
+  var cells = [];
+  appState.studies.forEach(function(study) {
+    var findingsText = study.key_findings.join(' ').toLowerCase();
+    appState.concepts.forEach(function(concept) {
+      var conceptLower = concept.toLowerCase().replace(/_/g, ' ');
+      var found = findingsText.indexOf(conceptLower) >= 0;
+      if (!found) {
+        found = study.quotes.some(function(q) { return q.text.toLowerCase().indexOf(conceptLower) >= 0; });
+      }
+      cells.push({
+        study_id: study.study_id,
+        concept: concept,
+        type: found ? 'present' : 'absent',
+        evidence: ''
+      });
+    });
+  });
+  appState.translationMatrix = {
+    concepts: appState.concepts.slice(),
+    studies: studyIds,
+    cells: cells,
+    translation_type: 'reciprocal'
+  };
+  return appState.translationMatrix;
+}
+
+function computeCoverage(nPresent, nStudies) {
+  if (nStudies <= 0) return 0;
+  return nPresent / nStudies;
+}
+
+function computeConsistency(nPresent, nRefutational) {
+  if (nPresent <= 0) return 0;
+  return (nPresent - nRefutational) / nPresent;
+}
+
+function classifyTranslation(consistency, hasRefutational) {
+  if (consistency >= 0.8 && !hasRefutational) return 'reciprocal';
+  if (consistency < 0.5) return 'refutational';
+  return 'line_of_argument';
+}
+
+function analyzeMatrix() {
+  if (!appState.translationMatrix) return null;
+  var matrix = appState.translationMatrix;
+  var conceptStats = {};
+  matrix.concepts.forEach(function(concept) {
+    var cellsForConcept = matrix.cells.filter(function(c) { return c.concept === concept; });
+    var nPresent = cellsForConcept.filter(function(c) { return c.type === 'present'; }).length;
+    var nRefutational = cellsForConcept.filter(function(c) { return c.type === 'refutational'; }).length;
+    var nStudies = matrix.studies.length;
+    conceptStats[concept] = {
+      coverage: Math.round(computeCoverage(nPresent, nStudies) * 1000) / 1000,
+      consistency: Math.round(computeConsistency(nPresent, nRefutational) * 1000) / 1000,
+      n_present: nPresent,
+      n_refutational: nRefutational
+    };
+  });
+  var allConsistencies = [];
+  Object.keys(conceptStats).forEach(function(k) {
+    if (conceptStats[k].n_present > 0) allConsistencies.push(conceptStats[k].consistency);
+  });
+  var avgConsistency = allConsistencies.length > 0 ? allConsistencies.reduce(function(a, b) { return a + b; }, 0) / allConsistencies.length : 1.0;
+  var hasRefutational = Object.keys(conceptStats).some(function(k) { return conceptStats[k].n_refutational > 0; });
+  var translationType = classifyTranslation(avgConsistency, hasRefutational);
+  matrix.translation_type = translationType;
+  return {
+    concept_stats: conceptStats,
+    overall_consistency: Math.round(avgConsistency * 1000) / 1000,
+    translation_type: translationType
+  };
+}
+
+// ---- CERQual ENGINE (ported from Python) ----
+var CONCERN_WEIGHTS = { 'no': 0, 'minor': 1, 'moderate': 2, 'serious': 3 };
+
+function assessCerqual(finding) {
+  var components = [
+    finding.methodological_limitations,
+    finding.coherence,
+    finding.adequacy,
+    finding.relevance
+  ];
+  var weights = components.map(function(c) { return CONCERN_WEIGHTS[c] !== undefined ? CONCERN_WEIGHTS[c] : 0; });
+  var total = weights.reduce(function(a, b) { return a + b; }, 0);
+  var maxConcern = Math.max.apply(null, weights);
+  var confidence;
+  if (maxConcern >= 3) { confidence = 'Very Low'; }
+  else if (maxConcern >= 2) { confidence = 'Low'; }
+  else if (total >= 3) { confidence = 'Low'; }
+  else if (total === 0) { confidence = 'High'; }
+  else { confidence = 'Moderate'; }
+  return Object.assign({}, finding, { overall_confidence: confidence });
+}
+
+// ---- SYNTHESIS ENGINE (ported from Python) ----
+function buildSoqfTable() {
+  return appState.cerqualFindings.map(function(f) {
+    var assessed = assessCerqual(f);
+    return {
+      finding_id: f.finding_id,
+      finding: f.finding_text,
+      confidence: assessed.overall_confidence,
+      n_studies: f.contributing_studies.length,
+      studies: f.contributing_studies.slice(),
+      explanation: f.explanation || ''
+    };
+  });
+}
+
+function buildThemeSummary() {
+  var descriptive = appState.themes.filter(function(t) { return t.level === 'descriptive'; });
+  var analytical = appState.themes.filter(function(t) { return t.level === 'analytical'; });
+  var allStudyIds = appState.studies.map(function(s) { return s.study_id; });
+  var covered = {};
+  appState.themes.forEach(function(t) {
+    t.assigned_studies.forEach(function(sid) { covered[sid] = true; });
+  });
+  var coveredCount = Object.keys(covered).filter(function(sid) { return allStudyIds.indexOf(sid) >= 0; }).length;
+  var coverage = allStudyIds.length > 0 ? Math.round((coveredCount / allStudyIds.length) * 100) / 100 : 0;
+  return {
+    n_descriptive: descriptive.length,
+    n_analytical: analytical.length,
+    n_total: appState.themes.length,
+    study_coverage: coverage,
+    descriptive_labels: descriptive.map(function(t) { return t.label; }),
+    analytical_labels: analytical.map(function(t) { return t.label; })
+  };
+}
+
+// ---- CERTIFIER (ported from Python) ----
+function computeInputHash() {
+  var data = appState.studies.map(function(s) {
+    return { id: s.study_id, year: s.year, n: s.sample_size };
+  });
+  var raw = JSON.stringify(data);
+  // Simple hash (not SHA256 but sufficient for browser)
+  var hash = 0;
+  for (var i = 0; i < raw.length; i++) {
+    var chr = raw.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+    hash |= 0;
+  }
+  return Math.abs(hash).toString(16).padStart(8, '0').substring(0, 16);
+}
+
+function certify() {
+  if (appState.studies.length < 2) return 'REJECT';
+  if (appState.themes.length === 0 && appState.cerqualFindings.length === 0) return 'WARN';
+  return 'PASS';
+}
+
+// ---- RENDERING: CODING PANEL ----
+function renderCodingPanel() {
+  renderCodingStudyFilter();
+  renderCodingQuotes();
+  renderCodingThemes();
+}
+
+function renderCodingStudyFilter() {
+  var sel = document.getElementById('coding-study-filter');
+  var val = sel.value;
+  sel.innerHTML = '<option value="all">All Studies</option>';
+  appState.studies.forEach(function(s) {
+    sel.innerHTML += '<option value="' + escapeHtml(s.study_id) + '">' + escapeHtml(s.study_id) + '</option>';
+  });
+  sel.value = val || 'all';
+}
+
+function renderCodingQuotes() {
+  var container = document.getElementById('coding-quotes-list');
+  var filter = document.getElementById('coding-study-filter').value;
+  var html = '';
+  appState.studies.forEach(function(s) {
+    if (filter !== 'all' && s.study_id !== filter) return;
+    s.quotes.forEach(function(q) {
+      var isSelected = appState.selectedQuote && appState.selectedQuote.quote_id === q.quote_id;
+      html += '<div class="quote-item' + (isSelected ? ' selected' : '') + '" ';
+      html += 'onclick="selectQuote(\'' + escapeHtml(q.quote_id) + '\',\'' + escapeHtml(s.study_id) + '\')" ';
+      html += 'role="option" aria-selected="' + isSelected + '" tabindex="0"';
+      html += ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){selectQuote(\'' + escapeHtml(q.quote_id) + '\',\'' + escapeHtml(s.study_id) + '\');event.preventDefault();}"';
+      html += '>';
+      html += '<div class="quote-text">"' + escapeHtml(q.text) + '"</div>';
+      html += '<div class="quote-meta">' + escapeHtml(s.study_id) + ' | ' + escapeHtml(q.participant_id) + ' | ' + escapeHtml(q.page) + '</div>';
+      html += '</div>';
+    });
+    // Also show key findings as codable items
+    s.key_findings.forEach(function(kf, idx) {
+      var fakeId = s.study_id + '_F' + idx;
+      var isSelected = appState.selectedQuote && appState.selectedQuote.quote_id === fakeId;
+      html += '<div class="quote-item' + (isSelected ? ' selected' : '') + '" ';
+      html += 'onclick="selectQuote(\'' + escapeHtml(fakeId) + '\',\'' + escapeHtml(s.study_id) + '\')" ';
+      html += 'role="option" aria-selected="' + isSelected + '" tabindex="0">';
+      html += '<div class="quote-text" style="font-style:normal;">' + escapeHtml(kf) + '</div>';
+      html += '<div class="quote-meta">' + escapeHtml(s.study_id) + ' | Finding #' + (idx + 1) + '</div>';
+      html += '</div>';
+    });
+  });
+  if (!html) html = '<p class="text-muted">No studies loaded. Add studies or load an example.</p>';
+  container.innerHTML = html;
+}
+
+function selectQuote(quoteId, studyId) {
+  appState.selectedQuote = { quote_id: quoteId, study_id: studyId };
+  renderCodingQuotes();
+  renderCodingThemes();
+  var info = document.getElementById('coding-selected-info');
+  info.style.display = 'block';
+  info.innerHTML = '<p class="text-sm">Selected: <strong>' + escapeHtml(quoteId) + '</strong> from ' + escapeHtml(studyId) + '. Click a theme below to assign.</p>';
+}
+
+function renderCodingThemes() {
+  var container = document.getElementById('coding-themes-list');
+  var nStudies = appState.studies.length;
+  var html = '';
+  appState.themes.forEach(function(t, idx) {
+    var sat = computeSaturation(t, nStudies);
+    var satPct = Math.round(sat * 100);
+    var isAssigned = appState.selectedQuote && t.assigned_quotes.indexOf(appState.selectedQuote.quote_id) >= 0;
+    html += '<div class="theme-card' + (t.level === 'analytical' ? ' analytical' : '') + '">';
+    html += '<div class="flex-between">';
+    html += '<div class="theme-label">' + escapeHtml(t.label) + ' <span class="badge badge-' + (t.level === 'analytical' ? 'moderate' : 'high') + '">' + t.level + '</span></div>';
+    if (appState.selectedQuote) {
+      if (isAssigned) {
+        html += '<button class="btn btn-sm btn-danger" onclick="unassignFromTheme(' + idx + ')" aria-label="Unassign quote from ' + escapeHtml(t.label) + '">Unassign</button>';
+      } else {
+        html += '<button class="btn btn-sm btn-primary" onclick="assignToTheme(' + idx + ')" aria-label="Assign quote to ' + escapeHtml(t.label) + '">Assign</button>';
+      }
+    }
+    html += '</div>';
+    if (t.description) html += '<div class="theme-desc">' + escapeHtml(t.description) + '</div>';
+    html += '<div class="theme-stats">Quotes: ' + t.assigned_quotes.length + ' | Studies: ' + t.assigned_studies.length + ' | Saturation: ' + satPct + '%</div>';
+    html += '</div>';
+  });
+  if (!html) html = '<p class="text-muted">No themes created. Click "+ New Theme" to start coding.</p>';
+  container.innerHTML = html;
+}
+
+function assignToTheme(themeIndex) {
+  if (!appState.selectedQuote) return;
+  assignQuoteToTheme(themeIndex, appState.selectedQuote.quote_id, appState.selectedQuote.study_id);
+  renderCodingThemes();
+  updateStatus('Assigned ' + appState.selectedQuote.quote_id + ' to ' + appState.themes[themeIndex].label);
+}
+
+function unassignFromTheme(themeIndex) {
+  if (!appState.selectedQuote) return;
+  unassignQuoteFromTheme(themeIndex, appState.selectedQuote.quote_id);
+  renderCodingThemes();
+  updateStatus('Unassigned ' + appState.selectedQuote.quote_id + ' from ' + appState.themes[themeIndex].label);
+}
+
+// ---- RENDERING: TRANSLATION MATRIX ----
+function renderTranslationMatrix() {
+  if (appState.concepts.length === 0 || appState.studies.length === 0) {
+    document.getElementById('translation-matrix-container').innerHTML =
+      '<p class="text-muted">Add concepts and studies to build the translation matrix. Use "Auto-Detect" to populate from key findings.</p>';
+    document.getElementById('translation-analysis').innerHTML = '';
+    return;
+  }
+  buildTranslationMatrix();
+  var matrix = appState.translationMatrix;
+  var html = '<table><thead><tr><th>Study</th>';
+  matrix.concepts.forEach(function(c) {
+    html += '<th style="text-align:center;font-size:0.8rem;">' + escapeHtml(c.replace(/_/g, ' ')) + '</th>';
+  });
+  html += '</tr></thead><tbody>';
+  matrix.studies.forEach(function(sid) {
+    html += '<tr><td><strong>' + escapeHtml(sid) + '</strong></td>';
+    matrix.concepts.forEach(function(concept) {
+      var cell = matrix.cells.find(function(c) { return c.study_id === sid && c.concept === concept; });
+      var cellType = cell ? cell.type : 'absent';
+      var cellClass = 'cell-' + cellType;
+      var label = cellType === 'present' ? '+' : cellType === 'refutational' ? 'R' : cellType === 'partial' ? '~' : '-';
+      html += '<td style="text-align:center;"><span class="matrix-cell ' + cellClass + '" ';
+      html += 'onclick="cycleMatrixCell(\'' + escapeHtml(sid) + '\',\'' + escapeHtml(concept) + '\')" ';
+      html += 'title="Click to cycle: present/absent/partial/refutational" role="button" tabindex="0"';
+      html += ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){cycleMatrixCell(\'' + escapeHtml(sid) + '\',\'' + escapeHtml(concept) + '\');event.preventDefault();}"';
+      html += '>' + label + '</span></td>';
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  document.getElementById('translation-matrix-container').innerHTML = html;
+
+  // Render analysis
+  var analysis = analyzeMatrix();
+  if (analysis) {
+    var aHtml = '<table><thead><tr><th>Concept</th><th>Coverage</th><th>Consistency</th><th>Present</th><th>Refutational</th></tr></thead><tbody>';
+    Object.keys(analysis.concept_stats).forEach(function(k) {
+      var s = analysis.concept_stats[k];
+      aHtml += '<tr><td>' + escapeHtml(k.replace(/_/g, ' ')) + '</td>';
+      aHtml += '<td>' + Math.round(s.coverage * 100) + '%</td>';
+      aHtml += '<td>' + Math.round(s.consistency * 100) + '%</td>';
+      aHtml += '<td>' + s.n_present + '</td>';
+      aHtml += '<td>' + s.n_refutational + '</td></tr>';
+    });
+    aHtml += '</tbody></table>';
+    aHtml += '<p class="mt-1 text-sm"><strong>Translation Type:</strong> <span class="badge badge-' + (analysis.translation_type === 'reciprocal' ? 'high' : analysis.translation_type === 'refutational' ? 'very-low' : 'moderate') + '">' + analysis.translation_type + '</span></p>';
+    aHtml += '<p class="text-sm"><strong>Overall Consistency:</strong> ' + Math.round(analysis.overall_consistency * 100) + '%</p>';
+    document.getElementById('translation-analysis').innerHTML = aHtml;
+  }
+}
+
+function cycleMatrixCell(studyId, concept) {
+  if (!appState.translationMatrix) return;
+  var cell = appState.translationMatrix.cells.find(function(c) { return c.study_id === studyId && c.concept === concept; });
+  if (!cell) return;
+  var order = ['present', 'absent', 'partial', 'refutational'];
+  var idx = order.indexOf(cell.type);
+  cell.type = order[(idx + 1) % order.length];
+  renderTranslationMatrix();
+}
+
+function autoDetectConcepts() {
+  // Extract concepts from key findings
+  var wordFreq = {};
+  appState.studies.forEach(function(s) {
+    s.key_findings.forEach(function(kf) {
+      kf.toLowerCase().replace(/[^a-z\s]/g, '').split(/\s+/).forEach(function(w) {
+        if (w.length > 4) {
+          wordFreq[w] = (wordFreq[w] || 0) + 1;
+        }
+      });
+    });
+  });
+  // Also add theme concepts
+  appState.themes.forEach(function(t) {
+    t.concepts.forEach(function(c) {
+      if (appState.concepts.indexOf(c) === -1) appState.concepts.push(c);
+    });
+  });
+  // Get top frequent meaningful words
+  var sorted = Object.keys(wordFreq).sort(function(a, b) { return wordFreq[b] - wordFreq[a]; });
+  sorted.slice(0, 8).forEach(function(w) {
+    if (appState.concepts.indexOf(w) === -1) appState.concepts.push(w);
+  });
+  renderTranslationMatrix();
+  updateStatus('Auto-detected ' + appState.concepts.length + ' concepts');
+}
+
+// ---- RENDERING: SYNTHESIS ----
+function renderSynthesis() {
+  var summary = buildThemeSummary();
+  var html = '<table>';
+  html += '<tr><td><strong>Total Themes</strong></td><td>' + summary.n_total + '</td></tr>';
+  html += '<tr><td><strong>Descriptive</strong></td><td>' + summary.n_descriptive + '</td></tr>';
+  html += '<tr><td><strong>Analytical</strong></td><td>' + summary.n_analytical + '</td></tr>';
+  html += '<tr><td><strong>Study Coverage</strong></td><td>' + Math.round(summary.study_coverage * 100) + '%</td></tr>';
+  html += '</table>';
+  if (summary.descriptive_labels.length > 0) {
+    html += '<p class="mt-1 text-sm"><strong>Descriptive:</strong> ' + summary.descriptive_labels.map(escapeHtml).join(', ') + '</p>';
+  }
+  if (summary.analytical_labels.length > 0) {
+    html += '<p class="text-sm"><strong>Analytical:</strong> ' + summary.analytical_labels.map(escapeHtml).join(', ') + '</p>';
+  }
+  document.getElementById('theme-summary-content').innerHTML = html;
+}
+
+// ---- RENDERING: CERQual PANEL ----
+function renderCerqualPanel() {
+  var container = document.getElementById('cerqual-findings-container');
+  if (appState.cerqualFindings.length === 0) {
+    container.innerHTML = '<div class="card"><p class="text-muted">No findings added. Click "+ Add Finding" to begin CERQual assessment.</p></div>';
+    return;
+  }
+  var html = '';
+  appState.cerqualFindings.forEach(function(f, idx) {
+    var assessed = assessCerqual(f);
+    html += '<div class="card">';
+    html += '<div class="flex-between mb-1">';
+    html += '<strong>' + escapeHtml(f.finding_id) + '</strong>';
+    html += '<span class="badge badge-' + confidenceToBadge(assessed.overall_confidence) + '">' + assessed.overall_confidence + '</span>';
+    html += '</div>';
+    html += '<p class="cerqual-finding-text mb-1">' + escapeHtml(f.finding_text) + '</p>';
+    html += '<div class="grid-3" style="grid-template-columns:repeat(4,1fr);gap:8px;">';
+    ['methodological_limitations', 'coherence', 'adequacy', 'relevance'].forEach(function(comp) {
+      var compLabel = comp.replace(/_/g, ' ');
+      compLabel = compLabel.charAt(0).toUpperCase() + compLabel.slice(1);
+      html += '<div>';
+      html += '<label for="cerqual-' + idx + '-' + comp + '" class="text-sm">' + compLabel + '</label>';
+      html += '<select id="cerqual-' + idx + '-' + comp + '" onchange="updateCerqualComponent(' + idx + ',\'' + comp + '\',this.value)" style="font-size:0.82rem;">';
+      ['no', 'minor', 'moderate', 'serious'].forEach(function(level) {
+        html += '<option value="' + level + '"' + (f[comp] === level ? ' selected' : '') + '>' + level + '</option>';
+      });
+      html += '</select></div>';
+    });
+    html += '</div>';
+    html += '<div class="mt-1 text-sm text-muted">Contributing: ' + f.contributing_studies.map(escapeHtml).join(', ') + '</div>';
+    html += '<button class="btn btn-sm btn-danger mt-1" onclick="removeFinding(' + idx + ')">Remove</button>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function updateCerqualComponent(findingIdx, component, value) {
+  appState.cerqualFindings[findingIdx][component] = value;
+  renderCerqualPanel();
+  renderCerqualTrafficLight();
+}
+
+function removeFinding(idx) {
+  appState.cerqualFindings.splice(idx, 1);
+  renderCerqualPanel();
+  renderCerqualTrafficLight();
+}
+
+// ---- RENDERING: REPORT ----
+function renderReport() {
+  renderSoqfTable();
+  renderMethodsParagraph();
+  renderThemeDescriptions();
+  renderCerqualJustification();
+  updateCertificationStatus();
+}
+
+function renderSoqfTable() {
+  var table = buildSoqfTable();
+  if (table.length === 0) {
+    document.getElementById('soqf-table-container').innerHTML = '<p class="text-muted">No CERQual findings to display.</p>';
+    return;
+  }
+  var html = '<table class="soqf-table"><thead><tr><th>Finding</th><th>CERQual</th><th>Studies</th><th>Explanation</th></tr></thead><tbody>';
+  table.forEach(function(row) {
+    html += '<tr>';
+    html += '<td>' + escapeHtml(row.finding) + '</td>';
+    html += '<td><span class="badge badge-' + confidenceToBadge(row.confidence) + '">' + row.confidence + '</span></td>';
+    html += '<td>' + row.n_studies + ' (' + row.studies.map(escapeHtml).join(', ') + ')</td>';
+    html += '<td>' + escapeHtml(row.explanation || 'No concerns identified') + '</td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  document.getElementById('soqf-table-container').innerHTML = html;
+}
+
+function renderMethodsParagraph() {
+  var nStudies = appState.studies.length;
+  if (nStudies === 0) {
+    document.getElementById('methods-paragraph').innerHTML = '<p class="text-muted">Load studies to generate methods paragraph.</p>';
+    return;
+  }
+  var methodTypes = {};
+  appState.studies.forEach(function(s) {
+    methodTypes[s.methodology] = (methodTypes[s.methodology] || 0) + 1;
+  });
+  var methodStr = Object.keys(methodTypes).map(function(k) {
+    return k.replace(/_/g, ' ') + ' (n=' + methodTypes[k] + ')';
+  }).join(', ');
+
+  var synthType = document.getElementById('synthesis-type').value === 'meta_ethnography' ? 'meta-ethnography (Noblit & Hare 1988)' : 'thematic synthesis (Thomas & Harden 2008)';
+  var totalN = appState.studies.reduce(function(sum, s) { return sum + s.sample_size; }, 0);
+
+  var para = 'We included ' + nStudies + ' qualitative studies (' + methodStr + ') with a combined sample of ' + totalN + ' participants. ';
+  para += 'Studies were synthesized using ' + synthType + '. ';
+  para += appState.themes.length + ' themes were identified (' + appState.themes.filter(function(t) { return t.level === 'descriptive'; }).length + ' descriptive, ' + appState.themes.filter(function(t) { return t.level === 'analytical'; }).length + ' analytical). ';
+  para += 'Confidence in findings was assessed using CERQual (Lewin et al. 2018). ';
+  if (appState.cerqualFindings.length > 0) {
+    var assessed = appState.cerqualFindings.map(assessCerqual);
+    var counts = { 'High': 0, 'Moderate': 0, 'Low': 0, 'Very Low': 0 };
+    assessed.forEach(function(a) { counts[a.overall_confidence]++; });
+    var parts = [];
+    Object.keys(counts).forEach(function(k) { if (counts[k] > 0) parts.push(counts[k] + ' ' + k); });
+    para += 'CERQual assessment: ' + parts.join(', ') + '.';
+  }
+  document.getElementById('methods-paragraph').innerHTML = '<p>' + escapeHtml(para) + '</p>';
+}
+
+function renderThemeDescriptions() {
+  var container = document.getElementById('theme-descriptions');
+  if (appState.themes.length === 0) {
+    container.innerHTML = '<p class="text-muted">No themes to describe.</p>';
+    return;
+  }
+  var html = '';
+  appState.themes.forEach(function(t) {
+    html += '<div class="mb-1">';
+    html += '<strong>' + escapeHtml(t.label) + '</strong>';
+    html += ' <span class="badge badge-' + (t.level === 'analytical' ? 'moderate' : 'high') + '">' + t.level + '</span>';
+    if (t.description) html += '<p class="text-sm">' + escapeHtml(t.description) + '</p>';
+    html += '<p class="text-sm text-muted">Studies: ' + t.assigned_studies.length + ' | Quotes: ' + t.assigned_quotes.length + '</p>';
+    // Show assigned quotes
+    if (t.assigned_quotes.length > 0) {
+      t.assigned_quotes.forEach(function(qid) {
+        var found = findQuoteById(qid);
+        if (found) {
+          html += '<blockquote style="border-left:3px solid var(--primary);padding-left:12px;margin:6px 0;font-style:italic;font-size:0.85rem;">"' + escapeHtml(found.text) + '"<br><span class="text-muted">-- ' + escapeHtml(found.participant_id) + ', ' + escapeHtml(found.page) + '</span></blockquote>';
+        }
+      });
+    }
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+function renderCerqualJustification() {
+  var container = document.getElementById('cerqual-justification');
+  if (appState.cerqualFindings.length === 0) {
+    container.innerHTML = '<p class="text-muted">No CERQual findings.</p>';
+    return;
+  }
+  var html = '<table><thead><tr><th>Finding</th><th>Meth. Lim.</th><th>Coherence</th><th>Adequacy</th><th>Relevance</th><th>Overall</th></tr></thead><tbody>';
+  appState.cerqualFindings.forEach(function(f) {
+    var assessed = assessCerqual(f);
+    html += '<tr>';
+    html += '<td>' + escapeHtml(f.finding_id) + '</td>';
+    ['methodological_limitations', 'coherence', 'adequacy', 'relevance'].forEach(function(comp) {
+      var val = f[comp];
+      html += '<td><span class="badge badge-' + concernToBadge(val) + '">' + val + '</span></td>';
+    });
+    html += '<td><span class="badge badge-' + confidenceToBadge(assessed.overall_confidence) + '">' + assessed.overall_confidence + '</span></td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+// ---- PLOTLY CHARTS ----
+function getPlotlyLayout(title) {
+  var isDark = document.body.classList.contains('dark');
+  return {
+    title: { text: title, font: { size: 14, color: isDark ? '#e2e8f0' : '#1e293b' } },
+    paper_bgcolor: isDark ? '#1e293b' : '#ffffff',
+    plot_bgcolor: isDark ? '#1e293b' : '#ffffff',
+    font: { color: isDark ? '#e2e8f0' : '#1e293b', family: 'Segoe UI, system-ui, sans-serif' },
+    margin: { t: 40, r: 20, b: 60, l: 80 }
+  };
+}
+
+function renderThemeNetworkChart() {
+  var container = document.getElementById('chart-theme-network');
+  if (appState.themes.length === 0) {
+    container.innerHTML = '<p class="text-muted">No themes to visualize.</p>';
+    return;
+  }
+
+  // Build adjacency: themes connected by shared studies
+  var nodes = appState.themes.map(function(t, i) {
+    return {
+      id: i,
+      label: t.label,
+      size: Math.max(10, t.assigned_quotes.length * 5),
+      level: t.level
+    };
+  });
+
+  var edges = [];
+  for (var i = 0; i < appState.themes.length; i++) {
+    for (var j = i + 1; j < appState.themes.length; j++) {
+      var shared = appState.themes[i].assigned_studies.filter(function(s) {
+        return appState.themes[j].assigned_studies.indexOf(s) >= 0;
+      });
+      if (shared.length > 0) {
+        edges.push({ from: i, to: j, weight: shared.length });
+      }
+    }
+  }
+
+  // Position nodes in a circle
+  var n = nodes.length;
+  var xs = nodes.map(function(_, i) { return Math.cos(2 * Math.PI * i / n); });
+  var ys = nodes.map(function(_, i) { return Math.sin(2 * Math.PI * i / n); });
+
+  var edgeXs = [];
+  var edgeYs = [];
+  edges.forEach(function(e) {
+    edgeXs.push(xs[e.from], xs[e.to], null);
+    edgeYs.push(ys[e.from], ys[e.to], null);
+  });
+
+  var edgeTrace = {
+    x: edgeXs, y: edgeYs,
+    mode: 'lines',
+    line: { width: 2, color: '#94a3b8' },
+    hoverinfo: 'none',
+    type: 'scatter'
+  };
+
+  var isDark = document.body.classList.contains('dark');
+  var nodeTrace = {
+    x: xs, y: ys,
+    mode: 'markers+text',
+    marker: {
+      size: nodes.map(function(n) { return n.size; }),
+      color: nodes.map(function(n) { return n.level === 'analytical' ? '#eab308' : '#0f766e'; }),
+      line: { width: 2, color: isDark ? '#1e293b' : '#ffffff' }
+    },
+    text: nodes.map(function(n) { return n.label; }),
+    textposition: 'top center',
+    textfont: { size: 11 },
+    hovertext: nodes.map(function(n) { return n.label + ' (' + n.level + ')'; }),
+    hoverinfo: 'text',
+    type: 'scatter'
+  };
+
+  var layout = getPlotlyLayout('Theme Network');
+  layout.showlegend = false;
+  layout.xaxis = { showgrid: false, zeroline: false, showticklabels: false };
+  layout.yaxis = { showgrid: false, zeroline: false, showticklabels: false };
+
+  Plotly.newPlot(container, [edgeTrace, nodeTrace], layout, { responsive: true });
+}
+
+function renderStudyThemeChart() {
+  var container = document.getElementById('chart-study-theme');
+  if (appState.studies.length === 0 || appState.themes.length === 0) {
+    container.innerHTML = '<p class="text-muted">Add studies and themes to see the matrix.</p>';
+    return;
+  }
+
+  var studyIds = appState.studies.map(function(s) { return s.study_id; });
+  var themeLabels = appState.themes.map(function(t) { return t.label; });
+
+  var z = [];
+  studyIds.forEach(function(sid) {
+    var row = [];
+    appState.themes.forEach(function(t) {
+      var count = t.assigned_quotes.filter(function(qid) {
+        return appState.studies.some(function(s) {
+          return s.study_id === sid && (s.quotes.some(function(q) { return q.quote_id === qid; }) || qid.startsWith(sid + '_F'));
+        });
+      }).length;
+      row.push(count);
+    });
+    z.push(row);
+  });
+
+  var trace = {
+    z: z,
+    x: themeLabels,
+    y: studyIds,
+    type: 'heatmap',
+    colorscale: [[0, '#f0fdfa'], [1, '#0f766e']],
+    showscale: true,
+    hovertemplate: 'Study: %{y}<br>Theme: %{x}<br>Quotes: %{z}<extra></extra>'
+  };
+
+  var layout = getPlotlyLayout('Study-Theme Matrix');
+  layout.xaxis = { title: 'Themes', tickangle: -45 };
+  layout.yaxis = { title: 'Studies' };
+  layout.margin.b = 100;
+
+  Plotly.newPlot(container, [trace], layout, { responsive: true });
+}
+
+function renderCerqualTrafficLight() {
+  var container = document.getElementById('chart-cerqual-traffic');
+  if (appState.cerqualFindings.length === 0) {
+    container.innerHTML = '<p class="text-muted">No CERQual findings to visualize.</p>';
+    return;
+  }
+
+  var components = ['Meth. Lim.', 'Coherence', 'Adequacy', 'Relevance', 'Overall'];
+  var findingIds = appState.cerqualFindings.map(function(f) { return f.finding_id; });
+  var colorMap = { 'no': '#16a34a', 'minor': '#eab308', 'moderate': '#f97316', 'serious': '#ef4444',
+                   'High': '#16a34a', 'Moderate': '#eab308', 'Low': '#f97316', 'Very Low': '#ef4444' };
+
+  var z = [];
+  var text = [];
+  appState.cerqualFindings.forEach(function(f) {
+    var assessed = assessCerqual(f);
+    var row = [f.methodological_limitations, f.coherence, f.adequacy, f.relevance, assessed.overall_confidence];
+    z.push(row.map(function(v) { return CONCERN_WEIGHTS[v] !== undefined ? CONCERN_WEIGHTS[v] : ({'High': 0, 'Moderate': 1, 'Low': 2, 'Very Low': 3})[v] || 0; }));
+    text.push(row);
+  });
+
+  var trace = {
+    z: z,
+    x: components,
+    y: findingIds,
+    type: 'heatmap',
+    colorscale: [[0, '#16a34a'], [0.33, '#eab308'], [0.67, '#f97316'], [1, '#ef4444']],
+    showscale: false,
+    text: text,
+    texttemplate: '%{text}',
+    hovertemplate: 'Finding: %{y}<br>Component: %{x}<br>Level: %{text}<extra></extra>'
+  };
+
+  var layout = getPlotlyLayout('CERQual Traffic Light');
+  layout.xaxis = { title: '' };
+  layout.yaxis = { title: '' };
+
+  Plotly.newPlot(container, [trace], layout, { responsive: true });
+}
+
+function replotAll() {
+  var activeTab = document.querySelector('.tab-btn.active');
+  if (activeTab) {
+    var tabName = activeTab.id.replace('tab-', '');
+    if (tabName === 'translation') { renderStudyThemeChart(); }
+    if (tabName === 'synthesis') { renderThemeNetworkChart(); }
+    if (tabName === 'cerqual') { renderCerqualTrafficLight(); }
+  }
+}
+
+// ---- MODAL ACTIONS ----
+function openCreateThemeModal() {
+  var nextId = 'T' + (appState.themes.length + 1);
+  document.getElementById('new-theme-id').value = nextId;
+  document.getElementById('new-theme-label').value = '';
+  document.getElementById('new-theme-desc').value = '';
+  document.getElementById('new-theme-level').value = 'descriptive';
+  openModal('modal-create-theme');
+}
+
+function createThemeFromModal() {
+  var id = document.getElementById('new-theme-id').value.trim();
+  var label = document.getElementById('new-theme-label').value.trim();
+  var desc = document.getElementById('new-theme-desc').value.trim();
+  var level = document.getElementById('new-theme-level').value;
+  if (!id || !label) { alert('Theme ID and Label are required.'); return; }
+  if (appState.themes.some(function(t) { return t.theme_id === id; })) {
+    alert('Theme ID already exists.'); return;
+  }
+  appState.themes.push(createTheme(id, label, desc, level));
+  closeModal('modal-create-theme');
+  renderCodingThemes();
+  updateStatus('Created theme: ' + label);
+}
+
+function openMergeThemeModal() {
+  document.getElementById('merge-theme-id').value = 'TM' + (appState.themes.length + 1);
+  document.getElementById('merge-theme-label').value = '';
+  var checkboxes = '';
+  appState.themes.forEach(function(t, idx) {
+    checkboxes += '<label style="display:flex;align-items:center;gap:6px;margin:4px 0;font-weight:normal;"><input type="checkbox" class="merge-cb" value="' + idx + '"> ' + escapeHtml(t.label) + ' (' + t.theme_id + ')</label>';
+  });
+  document.getElementById('merge-theme-checkboxes').innerHTML = checkboxes || '<p class="text-muted">No themes available.</p>';
+  openModal('modal-merge-theme');
+}
+
+function mergeThemesFromModal() {
+  var id = document.getElementById('merge-theme-id').value.trim();
+  var label = document.getElementById('merge-theme-label').value.trim();
+  var checked = document.querySelectorAll('.merge-cb:checked');
+  if (!id || !label) { alert('New ID and Label are required.'); return; }
+  if (checked.length < 2) { alert('Select at least 2 themes to merge.'); return; }
+  var indices = [];
+  checked.forEach(function(cb) { indices.push(parseInt(cb.value)); });
+  var merged = mergeThemesEngine(id, label, indices);
+  // Remove old themes (in reverse order to preserve indices)
+  indices.sort(function(a, b) { return b - a; }).forEach(function(idx) {
+    appState.themes.splice(idx, 1);
+  });
+  appState.themes.push(merged);
+  closeModal('modal-merge-theme');
+  renderCodingThemes();
+  updateStatus('Merged themes into: ' + label);
+}
+
+function openAddConceptModal() {
+  document.getElementById('new-concept-name').value = '';
+  openModal('modal-add-concept');
+}
+
+function addConceptFromModal() {
+  var name = document.getElementById('new-concept-name').value.trim();
+  if (!name) { alert('Concept name required.'); return; }
+  if (appState.concepts.indexOf(name) >= 0) { alert('Concept already exists.'); return; }
+  appState.concepts.push(name);
+  closeModal('modal-add-concept');
+  renderTranslationMatrix();
+  updateStatus('Added concept: ' + name);
+}
+
+function openAddFindingModal() {
+  var nextId = 'F' + (appState.cerqualFindings.length + 1);
+  document.getElementById('new-finding-id').value = nextId;
+  document.getElementById('new-finding-text').value = '';
+  var checkboxes = '';
+  appState.studies.forEach(function(s) {
+    checkboxes += '<label style="display:flex;align-items:center;gap:6px;margin:4px 0;font-weight:normal;"><input type="checkbox" class="finding-study-cb" value="' + escapeHtml(s.study_id) + '"> ' + escapeHtml(s.study_id) + '</label>';
+  });
+  document.getElementById('finding-study-checkboxes').innerHTML = checkboxes || '<p class="text-muted">No studies available.</p>';
+  openModal('modal-add-finding');
+}
+
+function addFindingFromModal() {
+  var id = document.getElementById('new-finding-id').value.trim();
+  var text = document.getElementById('new-finding-text').value.trim();
+  var checked = document.querySelectorAll('.finding-study-cb:checked');
+  if (!id || !text) { alert('Finding ID and text required.'); return; }
+  var studies = [];
+  checked.forEach(function(cb) { studies.push(cb.value); });
+  appState.cerqualFindings.push({
+    finding_id: id,
+    finding_text: text,
+    methodological_limitations: 'no',
+    coherence: 'no',
+    adequacy: 'no',
+    relevance: 'no',
+    overall_confidence: '',
+    explanation: '',
+    contributing_studies: studies
+  });
+  closeModal('modal-add-finding');
+  renderCerqualPanel();
+  updateStatus('Added finding: ' + id);
+}
+
+// ---- IMPORT / EXPORT ----
+function importJSON() {
+  document.getElementById('import-file-input').click();
+}
+
+function handleImportFile(event) {
+  var file = event.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var data = JSON.parse(e.target.result);
+      loadDataset(data);
+      updateStatus('Imported: ' + (data.name || file.name));
+    } catch (err) {
+      alert('Invalid JSON file: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function loadDataset(data) {
+  // Load studies
+  appState.studies = (data.studies || []).map(function(s) {
+    return {
+      study_id: s.study_id || '',
+      title: s.title || '',
+      authors: s.authors || '',
+      year: s.year || 2024,
+      methodology: s.methodology || 'other',
+      setting: s.setting || '',
+      participants: s.participants || '',
+      sample_size: s.sample_size || 0,
+      key_findings: s.key_findings || [],
+      quotes: (s.quotes || []).map(function(q) {
+        return {
+          quote_id: q.quote_id || '',
+          text: q.text || '',
+          participant_id: q.participant_id || '',
+          page: q.page || '',
+          context: q.context || ''
+        };
+      }),
+      quality_tool: s.quality_tool || 'CASP',
+      quality_score: s.quality_score || 'moderate'
+    };
+  });
+
+  // Load themes
+  appState.themes = (data.themes || []).map(function(t) {
+    return {
+      theme_id: t.theme_id || '',
+      label: t.label || '',
+      description: t.description || '',
+      level: t.level || 'descriptive',
+      parent_id: t.parent_id || null,
+      assigned_quotes: t.assigned_quotes || [],
+      assigned_studies: t.assigned_studies || [],
+      concepts: t.concepts || []
+    };
+  });
+
+  // Load concepts
+  appState.concepts = data.concepts || [];
+
+  // Load CERQual findings
+  appState.cerqualFindings = (data.cerqual_findings || []).map(function(f) {
+    return {
+      finding_id: f.finding_id || '',
+      finding_text: f.finding_text || '',
+      methodological_limitations: f.methodological_limitations || 'no',
+      coherence: f.coherence || 'no',
+      adequacy: f.adequacy || 'no',
+      relevance: f.relevance || 'no',
+      overall_confidence: f.overall_confidence || '',
+      explanation: f.explanation || '',
+      contributing_studies: f.contributing_studies || []
+    };
+  });
+
+  appState.synthesisType = data.synthesis_type || 'thematic_synthesis';
+  document.getElementById('synthesis-type').value = appState.synthesisType;
+
+  renderStudyTable();
+  renderCodingPanel();
+}
+
+function exportTruthCert() {
+  var cert = certify();
+  var hash = computeInputHash();
+  var assessed = appState.cerqualFindings.map(assessCerqual);
+  var soqf = buildSoqfTable();
+  var summary = buildThemeSummary();
+
+  var bundle = {
+    tool: 'QualSynth',
+    version: '0.1.0',
+    generated: new Date().toISOString(),
+    input_hash: hash,
+    certification: cert,
+    synthesis_type: appState.synthesisType,
+    n_studies: appState.studies.length,
+    n_themes: appState.themes.length,
+    n_analytical_themes: summary.n_analytical,
+    n_findings: appState.cerqualFindings.length,
+    studies: appState.studies.map(function(s) {
+      return {
+        study_id: s.study_id,
+        year: s.year,
+        methodology: s.methodology,
+        sample_size: s.sample_size,
+        quality_score: s.quality_score,
+        n_quotes: s.quotes.length,
+        n_findings: s.key_findings.length
+      };
+    }),
+    themes: buildThemeStats(),
+    soqf_table: soqf,
+    cerqual_details: assessed.map(function(f) {
+      return {
+        finding_id: f.finding_id,
+        methodological_limitations: f.methodological_limitations,
+        coherence: f.coherence,
+        adequacy: f.adequacy,
+        relevance: f.relevance,
+        overall_confidence: f.overall_confidence,
+        n_contributing_studies: f.contributing_studies.length
+      };
+    }),
+    theme_summary: summary
+  };
+
+  if (appState.translationMatrix) {
+    var analysis = analyzeMatrix();
+    bundle.translation_analysis = analysis;
+  }
+
+  var json = JSON.stringify(bundle, null, 2);
+  var blob = new Blob([json], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'qualsynth-truthcert-' + hash + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  updateStatus('Exported TruthCert bundle (certification: ' + cert + ')');
+}
+
+function copyReportToClipboard() {
+  var methodsEl = document.getElementById('methods-paragraph');
+  var soqfEl = document.getElementById('soqf-table-container');
+  var text = 'METHODS\n' + (methodsEl.textContent || '') + '\n\nSoQF TABLE\n' + (soqfEl.textContent || '');
+  navigator.clipboard.writeText(text).then(function() {
+    updateStatus('Report copied to clipboard');
+  });
+}
+
+// ---- BUILT-IN EXAMPLES ----
+function loadExample(name) {
+  if (name === 'diabetes') {
+    loadDataset(getDiabetesExample());
+  } else if (name === 'burnout') {
+    loadDataset(getBurnoutExample());
+  }
+  switchTab('studies');
+  updateStatus('Loaded example: ' + name);
+}
+
+function getDiabetesExample() {
+  return {
+    "name": "Patient Experience of T2DM Self-Management",
+    "synthesis_type": "thematic_synthesis",
+    "studies": [
+      {
+        "study_id": "Bury2005", "title": "Living with diabetes in a multi-ethnic community",
+        "authors": "Bury M et al.", "year": 2005, "methodology": "phenomenology",
+        "setting": "UK primary care, multi-ethnic London borough",
+        "participants": "25 adults with T2DM (12 South Asian, 13 White British)",
+        "sample_size": 25, "quality_tool": "CASP", "quality_score": "high",
+        "key_findings": [
+          "Diabetes experienced as an unwelcome identity shift",
+          "Dietary management creates social tension at family meals",
+          "Language barriers compound clinical confusion"
+        ],
+        "quotes": [
+          {"quote_id": "B1", "text": "It changed who I am. I'm not the same person anymore.", "participant_id": "P03", "page": "p.412", "context": "Discussing diagnosis impact"},
+          {"quote_id": "B2", "text": "My mother-in-law cooks everything with ghee. I can't refuse without causing offence.", "participant_id": "P08", "page": "p.415", "context": "Dietary challenges"}
+        ]
+      },
+      {
+        "study_id": "Lawton2006", "title": "Perceptions and experiences of taking oral hypoglycaemics",
+        "authors": "Lawton J et al.", "year": 2006, "methodology": "grounded_theory",
+        "setting": "Scotland, primary and secondary care",
+        "participants": "40 patients with T2DM starting oral medication",
+        "sample_size": 40, "quality_tool": "CASP", "quality_score": "high",
+        "key_findings": [
+          "Medication seen as proof of personal failure to control diet",
+          "Tablet-taking normalises the condition over time",
+          "Side effects rarely discussed with clinicians"
+        ],
+        "quotes": [
+          {"quote_id": "L1", "text": "Taking tablets means I've failed, doesn't it? I couldn't do it with food alone.", "participant_id": "P12", "page": "p.1586", "context": "Starting medication"},
+          {"quote_id": "L2", "text": "After a while you just pop the pill and forget about it. It becomes normal.", "participant_id": "P28", "page": "p.1588", "context": "Normalisation"}
+        ]
+      },
+      {
+        "study_id": "Rise2013", "title": "Making sense of diabetes self-management",
+        "authors": "Rise MB et al.", "year": 2013, "methodology": "phenomenology",
+        "setting": "Norway, diabetes education centre",
+        "participants": "12 adults with T2DM attending education programme",
+        "sample_size": 12, "quality_tool": "CASP", "quality_score": "moderate",
+        "key_findings": [
+          "Knowledge empowers but also creates anxiety about complications",
+          "Peer support from other patients is more valued than clinical advice",
+          "Self-monitoring enables sense of control"
+        ],
+        "quotes": [
+          {"quote_id": "R1", "text": "Knowing what could happen scares me but also makes me try harder.", "participant_id": "P04", "page": "p.8", "context": "Education outcomes"},
+          {"quote_id": "R2", "text": "The others in the group understand. My doctor doesn't live with it.", "participant_id": "P09", "page": "p.10", "context": "Peer support"}
+        ]
+      },
+      {
+        "study_id": "Gomersall2011", "title": "Conducting systematic reviews of qualitative studies of chronic illness",
+        "authors": "Gomersall T et al.", "year": 2011, "methodology": "ethnography",
+        "setting": "UK, community settings",
+        "participants": "15 adults managing T2DM long-term (5+ years)",
+        "sample_size": 15, "quality_tool": "CASP", "quality_score": "high",
+        "key_findings": [
+          "Long-term management leads to 'diabetes fatigue'",
+          "Social identity as 'diabetic' resisted by most participants",
+          "Technology (glucose monitors) both liberates and constrains"
+        ],
+        "quotes": [
+          {"quote_id": "G1", "text": "I'm tired of thinking about it every single day. It never stops.", "participant_id": "P07", "page": "p.223", "context": "Long-term burden"},
+          {"quote_id": "G2", "text": "I don't tell people. It's my business, not theirs.", "participant_id": "P11", "page": "p.225", "context": "Identity management"}
+        ]
+      },
+      {
+        "study_id": "Peel2004", "title": "Diagnosis and self-management of type 2 diabetes",
+        "authors": "Peel E et al.", "year": 2004, "methodology": "grounded_theory",
+        "setting": "UK, primary care",
+        "participants": "40 newly diagnosed T2DM patients, longitudinal (over 1 year)",
+        "sample_size": 40, "quality_tool": "CASP", "quality_score": "high",
+        "key_findings": [
+          "Initial relief at diagnosis ('at least it's not cancer') shifts to chronic burden",
+          "Dietary advice perceived as contradictory and confusing",
+          "Partners become informal health monitors creating relationship tension"
+        ],
+        "quotes": [
+          {"quote_id": "P1", "text": "At first I thought, well at least it's manageable. Now I'm not so sure.", "participant_id": "P16", "page": "p.68", "context": "Trajectory of experience"},
+          {"quote_id": "P2", "text": "My wife watches everything I eat now. It causes rows.", "participant_id": "P33", "page": "p.71", "context": "Relationship impact"}
+        ]
+      }
+    ],
+    "themes": [
+      {"theme_id": "T1", "label": "Identity disruption", "level": "descriptive", "description": "Diabetes challenges existing self-concept and social identity"},
+      {"theme_id": "T2", "label": "Daily burden of management", "level": "descriptive", "description": "Constant cognitive and practical demands of self-management"},
+      {"theme_id": "T3", "label": "Social navigation", "level": "descriptive", "description": "Managing diabetes within family, cultural, and social contexts"},
+      {"theme_id": "T4", "label": "Empowerment through knowledge", "level": "descriptive", "description": "Knowledge and self-monitoring as sources of control and anxiety"},
+      {"theme_id": "A1", "label": "Living with a contested self", "level": "analytical", "description": "Overarching theme: diabetes creates ongoing tension between the pre-diagnosis self and the 'diabetic' identity, mediated by social context and knowledge"}
+    ],
+    "cerqual_findings": [
+      {
+        "finding_id": "F1",
+        "finding_text": "People with T2DM experience diagnosis as a threat to their existing identity, resisting the label of 'diabetic' while gradually incorporating management into daily routines.",
+        "methodological_limitations": "minor", "coherence": "no", "adequacy": "no", "relevance": "no",
+        "contributing_studies": ["Bury2005", "Gomersall2011", "Peel2004", "Lawton2006"]
+      },
+      {
+        "finding_id": "F2",
+        "finding_text": "Self-management creates ongoing daily burden that participants describe as exhausting, with 'diabetes fatigue' emerging in long-term management.",
+        "methodological_limitations": "no", "coherence": "no", "adequacy": "minor", "relevance": "no",
+        "contributing_studies": ["Gomersall2011", "Bury2005", "Rise2013", "Peel2004"]
+      },
+      {
+        "finding_id": "F3",
+        "finding_text": "Dietary management is the most socially disruptive aspect, creating tension with family members and within cultural food practices.",
+        "methodological_limitations": "no", "coherence": "no", "adequacy": "no", "relevance": "minor",
+        "contributing_studies": ["Bury2005", "Peel2004", "Lawton2006"]
+      },
+      {
+        "finding_id": "F4",
+        "finding_text": "Peer support from others with diabetes is valued above professional clinical advice for day-to-day management strategies.",
+        "methodological_limitations": "minor", "coherence": "no", "adequacy": "moderate", "relevance": "no",
+        "contributing_studies": ["Rise2013", "Gomersall2011"]
+      }
+    ]
+  };
+}
+
+function getBurnoutExample() {
+  return {
+    "name": "Healthcare Worker Burnout During COVID-19",
+    "synthesis_type": "meta_ethnography",
+    "studies": [
+      {
+        "study_id": "Billings2021", "title": "Experiences of frontline healthcare workers during COVID-19",
+        "authors": "Billings J et al.", "year": 2021, "methodology": "phenomenology",
+        "setting": "UK NHS intensive care units",
+        "participants": "20 ICU nurses and doctors",
+        "sample_size": 20, "quality_tool": "CASP", "quality_score": "high",
+        "key_findings": [
+          "Moral distress from rationing care and PPE shortages",
+          "Institutional communication perceived as inadequate and delayed",
+          "Peer bonding strengthened under shared adversity"
+        ],
+        "quotes": [
+          {"quote_id": "Bi1", "text": "We had to decide who gets the ventilator. That stays with you.", "participant_id": "N04", "page": "p.5", "context": "Triage decisions"},
+          {"quote_id": "Bi2", "text": "Management sent emails. We needed them on the floor.", "participant_id": "D02", "page": "p.7", "context": "Leadership gap"}
+        ]
+      },
+      {
+        "study_id": "Catton2021", "title": "Global nursing workforce and COVID-19",
+        "authors": "Catton H et al.", "year": 2021, "methodology": "grounded_theory",
+        "setting": "Multi-country (UK, Italy, Brazil, India)",
+        "participants": "35 nurses across 4 countries",
+        "sample_size": 35, "quality_tool": "CASP", "quality_score": "moderate",
+        "key_findings": [
+          "Feeling abandoned by institutions while being publicly celebrated",
+          "International differences in PPE access created moral anger",
+          "Finding purpose through collective action and advocacy"
+        ],
+        "quotes": [
+          {"quote_id": "C1", "text": "They called us heroes but wouldn't give us masks.", "participant_id": "N12", "page": "p.22", "context": "Hero narrative critique"},
+          {"quote_id": "C2", "text": "I stayed because my colleagues needed me, not because the hospital asked.", "participant_id": "N28", "page": "p.25", "context": "Peer motivation"}
+        ]
+      },
+      {
+        "study_id": "Moradi2021", "title": "Healthcare workers' mental health during COVID-19",
+        "authors": "Moradi Y et al.", "year": 2021, "methodology": "phenomenology",
+        "setting": "Iran, public hospitals",
+        "participants": "18 nurses and physicians",
+        "sample_size": 18, "quality_tool": "CASP", "quality_score": "moderate",
+        "key_findings": [
+          "Fear of infecting family members dominated daily life",
+          "Spiritual coping mechanisms (prayer, faith) provided resilience",
+          "Professional identity strengthened through crisis"
+        ],
+        "quotes": [
+          {"quote_id": "M1", "text": "I slept in my car for two months so I wouldn't bring it home.", "participant_id": "P05", "page": "p.4", "context": "Family separation"},
+          {"quote_id": "M2", "text": "My faith kept me going when medicine couldn't help.", "participant_id": "P11", "page": "p.6", "context": "Spiritual coping"}
+        ]
+      },
+      {
+        "study_id": "Vindrola2020", "title": "Healthcare workers experiences during COVID-19",
+        "authors": "Vindrola-Padros C et al.", "year": 2020, "methodology": "case_study",
+        "setting": "UK NHS, multiple trusts",
+        "participants": "30 HCWs (nurses, doctors, allied health)",
+        "sample_size": 30, "quality_tool": "JBI", "quality_score": "high",
+        "key_findings": [
+          "Rapid redeployment caused de-skilling anxiety",
+          "Meaning-making through narratives of purpose and duty",
+          "Post-peak psychological fallout worse than during peak"
+        ],
+        "quotes": [
+          {"quote_id": "V1", "text": "I'm a dermatologist. They put me on a COVID ward. I felt useless.", "participant_id": "D08", "page": "p.12", "context": "Redeployment anxiety"},
+          {"quote_id": "V2", "text": "The worst part came after. When it slowed down, everything hit me.", "participant_id": "N15", "page": "p.14", "context": "Delayed distress"}
+        ]
+      }
+    ],
+    "concepts": ["moral_distress", "institutional_abandonment", "peer_solidarity", "meaning_making", "fear_of_contagion", "spiritual_coping"],
+    "cerqual_findings": [
+      {
+        "finding_id": "F1",
+        "finding_text": "Healthcare workers experienced profound moral distress from resource rationing, triage decisions, and witnessing preventable suffering.",
+        "methodological_limitations": "no", "coherence": "no", "adequacy": "no", "relevance": "no",
+        "contributing_studies": ["Billings2021", "Catton2021", "Moradi2021", "Vindrola2020"]
+      },
+      {
+        "finding_id": "F2",
+        "finding_text": "A pervasive sense of institutional abandonment -- being publicly praised while privately unsupported -- was a dominant source of anger.",
+        "methodological_limitations": "minor", "coherence": "no", "adequacy": "no", "relevance": "minor",
+        "contributing_studies": ["Billings2021", "Catton2021", "Vindrola2020"]
+      },
+      {
+        "finding_id": "F3",
+        "finding_text": "Peer solidarity and collective identity among frontline staff emerged as the primary coping mechanism, valued above institutional or psychological support.",
+        "methodological_limitations": "no", "coherence": "no", "adequacy": "minor", "relevance": "no",
+        "contributing_studies": ["Billings2021", "Catton2021", "Moradi2021"]
+      }
+    ]
+  };
+}
+
+// ---- CLEAR ALL ----
+function clearAll() {
+  if (!confirm('Clear all data? This cannot be undone.')) return;
+  appState.studies = [];
+  appState.themes = [];
+  appState.concepts = [];
+  appState.cerqualFindings = [];
+  appState.translationMatrix = null;
+  appState.selectedQuote = null;
+  renderStudyTable();
+  updateStatus('All data cleared');
+}
+
+// ---- UTILITY ----
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function confidenceToBadge(confidence) {
+  if (confidence === 'High') return 'high';
+  if (confidence === 'Moderate') return 'moderate';
+  if (confidence === 'Low') return 'low';
+  return 'very-low';
+}
+
+function concernToBadge(concern) {
+  if (concern === 'no') return 'high';
+  if (concern === 'minor') return 'moderate';
+  if (concern === 'moderate') return 'low';
+  return 'very-low';
+}
+
+function findQuoteById(quoteId) {
+  for (var i = 0; i < appState.studies.length; i++) {
+    var s = appState.studies[i];
+    for (var j = 0; j < s.quotes.length; j++) {
+      if (s.quotes[j].quote_id === quoteId) return s.quotes[j];
+    }
+  }
+  return null;
+}
+
+function updateStatus(msg) {
+  document.getElementById('status-text').textContent = msg;
+  updateCertificationStatus();
+}
+
+function updateCertificationStatus() {
+  var cert = certify();
+  var el = document.getElementById('status-cert');
+  el.textContent = 'Certification: ' + cert;
+  el.style.color = cert === 'PASS' ? 'var(--high)' : cert === 'WARN' ? 'var(--moderate)' : 'var(--very-low)';
+}
+
+// ---- KEYBOARD NAVIGATION ----
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    var modals = document.querySelectorAll('.modal-overlay.active');
+    modals.forEach(function(m) { m.classList.remove('active'); });
+  }
+});
+
+// ---- INIT ----
+renderStudyTable();
+updateCertificationStatus();
+</script>
+</body>
+</html>
