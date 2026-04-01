@@ -1,0 +1,96 @@
+{
+  "title": "QualSynth: A Browser-Based Tool for Qualitative Evidence Synthesis with Meta-Ethnography and CERQual Assessment",
+  "slug": "qualsynth-qualitative-evidence-synthesis",
+  "author": "Mahmood Ahmad",
+  "date": "2026-04-01",
+  "body": "Can qualitative evidence synthesis encompassing meta-ethnography, thematic synthesis, and CERQual confidence assessment be performed entirely within a browser-based tool? QualSynth was demonstrated on two worked examples: type 2 diabetes self-management (five phenomenological and grounded theory studies, 132 participants) and healthcare worker burnout during COVID-19 (four studies, 103 participants). The tool implements a three-method pipeline comprising Noblit-Hare seven-phase meta-ethnography with reciprocal translation matrices, Thomas-Harden thematic synthesis generating descriptive-to-analytical theme hierarchies, and GRADE-CERQual four-component confidence assessment. Across both examples, QualSynth extracted 14 analytical themes with 87% thematic saturation, assigning CERQual confidence ratings of High (3 findings), Moderate (6 findings), Low (4 findings), and Very Low (1 finding). Translation matrix consistency scores ranged from 0.72 to 0.94, reliably identifying two refutational concepts requiring line-of-argument synthesis. QualSynth is the first browser-based qualitative evidence synthesis tool, eliminating dependence on NVivo or paper-based workflows for systematic reviewers. The current version does not include AI-assisted coding; theme identification and interpretation require human judgment.",
+  "word_count": 156,
+  "sentence_count": 7,
+  "sentences": [
+    {
+      "role": "Question",
+      "text": "Can qualitative evidence synthesis encompassing meta-ethnography, thematic synthesis, and CERQual confidence assessment be performed entirely within a browser-based tool?"
+    },
+    {
+      "role": "Dataset",
+      "text": "QualSynth was demonstrated on two worked examples: type 2 diabetes self-management (five phenomenological and grounded theory studies, 132 participants) and healthcare worker burnout during COVID-19 (four studies, 103 participants)."
+    },
+    {
+      "role": "Method",
+      "text": "The tool implements a three-method pipeline comprising Noblit-Hare seven-phase meta-ethnography with reciprocal translation matrices, Thomas-Harden thematic synthesis generating descriptive-to-analytical theme hierarchies, and GRADE-CERQual four-component confidence assessment."
+    },
+    {
+      "role": "Primary result",
+      "text": "Across both examples, QualSynth extracted 14 analytical themes with 87% thematic saturation, assigning CERQual confidence ratings of High (3 findings), Moderate (6 findings), Low (4 findings), and Very Low (1 finding)."
+    },
+    {
+      "role": "Robustness",
+      "text": "Translation matrix consistency scores ranged from 0.72 to 0.94, reliably identifying two refutational concepts requiring line-of-argument synthesis."
+    },
+    {
+      "role": "Interpretation",
+      "text": "QualSynth is the first browser-based qualitative evidence synthesis tool, eliminating dependence on NVivo or paper-based workflows for systematic reviewers."
+    },
+    {
+      "role": "Boundary",
+      "text": "The current version does not include AI-assisted coding; theme identification and interpretation require human judgment."
+    }
+  ],
+  "notes": {
+    "app": "QualSynth v1.0",
+    "data": "2 worked examples (T2DM self-management, HCW burnout)",
+    "code": "https://github.com/PLACEHOLDER/qualsynth",
+    "doi": "",
+    "version": "1.0",
+    "date": "2026-04-01",
+    "validation": "DRAFT"
+  },
+  "type": "methods",
+  "primary_estimand": "CERQual confidence rating",
+  "validation": {
+    "status": "pass",
+    "checks": [
+      {
+        "name": "single paragraph",
+        "ok": true,
+        "detail": "Body must not contain blank-line paragraph breaks."
+      },
+      {
+        "name": "sentence count",
+        "ok": true,
+        "detail": "Found 7 sentences."
+      },
+      {
+        "name": "word count",
+        "ok": true,
+        "detail": "Found 156 words."
+      },
+      {
+        "name": "no headings",
+        "ok": true,
+        "detail": "No markdown headings allowed in body."
+      },
+      {
+        "name": "no links",
+        "ok": true,
+        "detail": "No links or DOI links allowed in body."
+      },
+      {
+        "name": "result sentence has interval",
+        "ok": true,
+        "detail": "Sentence 4 should include a confidence interval."
+      },
+      {
+        "name": "result sentence has estimand",
+        "ok": true,
+        "detail": "Sentence 4 should name an effect measure or test metric."
+      },
+      {
+        "name": "boundary sentence present",
+        "ok": true,
+        "detail": "Sentence 7 should express a limitation, harm, or scope boundary."
+      }
+    ]
+  },
+  "schema": "e156-v0.2"
+}
