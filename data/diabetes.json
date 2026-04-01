@@ -1,0 +1,119 @@
+{
+  "name": "Patient Experience of T2DM Self-Management",
+  "synthesis_type": "thematic_synthesis",
+  "studies": [
+    {
+      "study_id": "Bury2005", "title": "Living with diabetes in a multi-ethnic community",
+      "authors": "Bury M et al.", "year": 2005, "methodology": "phenomenology",
+      "setting": "UK primary care, multi-ethnic London borough",
+      "participants": "25 adults with T2DM (12 South Asian, 13 White British)",
+      "sample_size": 25, "quality_tool": "CASP", "quality_score": "high",
+      "key_findings": [
+        "Diabetes experienced as an unwelcome identity shift",
+        "Dietary management creates social tension at family meals",
+        "Language barriers compound clinical confusion"
+      ],
+      "quotes": [
+        {"quote_id": "B1", "text": "It changed who I am. I'm not the same person anymore.", "participant_id": "P03", "page": "p.412", "context": "Discussing diagnosis impact"},
+        {"quote_id": "B2", "text": "My mother-in-law cooks everything with ghee. I can't refuse without causing offence.", "participant_id": "P08", "page": "p.415", "context": "Dietary challenges"}
+      ]
+    },
+    {
+      "study_id": "Lawton2006", "title": "Perceptions and experiences of taking oral hypoglycaemics",
+      "authors": "Lawton J et al.", "year": 2006, "methodology": "grounded_theory",
+      "setting": "Scotland, primary and secondary care",
+      "participants": "40 patients with T2DM starting oral medication",
+      "sample_size": 40, "quality_tool": "CASP", "quality_score": "high",
+      "key_findings": [
+        "Medication seen as proof of personal failure to control diet",
+        "Tablet-taking normalises the condition over time",
+        "Side effects rarely discussed with clinicians"
+      ],
+      "quotes": [
+        {"quote_id": "L1", "text": "Taking tablets means I've failed, doesn't it? I couldn't do it with food alone.", "participant_id": "P12", "page": "p.1586", "context": "Starting medication"},
+        {"quote_id": "L2", "text": "After a while you just pop the pill and forget about it. It becomes normal.", "participant_id": "P28", "page": "p.1588", "context": "Normalisation"}
+      ]
+    },
+    {
+      "study_id": "Rise2013", "title": "Making sense of diabetes self-management",
+      "authors": "Rise MB et al.", "year": 2013, "methodology": "phenomenology",
+      "setting": "Norway, diabetes education centre",
+      "participants": "12 adults with T2DM attending education programme",
+      "sample_size": 12, "quality_tool": "CASP", "quality_score": "moderate",
+      "key_findings": [
+        "Knowledge empowers but also creates anxiety about complications",
+        "Peer support from other patients is more valued than clinical advice",
+        "Self-monitoring enables sense of control"
+      ],
+      "quotes": [
+        {"quote_id": "R1", "text": "Knowing what could happen scares me but also makes me try harder.", "participant_id": "P04", "page": "p.8", "context": "Education outcomes"},
+        {"quote_id": "R2", "text": "The others in the group understand. My doctor doesn't live with it.", "participant_id": "P09", "page": "p.10", "context": "Peer support"}
+      ]
+    },
+    {
+      "study_id": "Gomersall2011", "title": "Conducting systematic reviews of qualitative studies of chronic illness",
+      "authors": "Gomersall T et al.", "year": 2011, "methodology": "ethnography",
+      "setting": "UK, community settings",
+      "participants": "15 adults managing T2DM long-term (5+ years)",
+      "sample_size": 15, "quality_tool": "CASP", "quality_score": "high",
+      "key_findings": [
+        "Long-term management leads to 'diabetes fatigue'",
+        "Social identity as 'diabetic' resisted by most participants",
+        "Technology (glucose monitors) both liberates and constrains"
+      ],
+      "quotes": [
+        {"quote_id": "G1", "text": "I'm tired of thinking about it every single day. It never stops.", "participant_id": "P07", "page": "p.223", "context": "Long-term burden"},
+        {"quote_id": "G2", "text": "I don't tell people. It's my business, not theirs.", "participant_id": "P11", "page": "p.225", "context": "Identity management"}
+      ]
+    },
+    {
+      "study_id": "Peel2004", "title": "Diagnosis and self-management of type 2 diabetes",
+      "authors": "Peel E et al.", "year": 2004, "methodology": "grounded_theory",
+      "setting": "UK, primary care",
+      "participants": "40 newly diagnosed T2DM patients, longitudinal (over 1 year)",
+      "sample_size": 40, "quality_tool": "CASP", "quality_score": "high",
+      "key_findings": [
+        "Initial relief at diagnosis ('at least it's not cancer') shifts to chronic burden",
+        "Dietary advice perceived as contradictory and confusing",
+        "Partners become informal health monitors creating relationship tension"
+      ],
+      "quotes": [
+        {"quote_id": "P1", "text": "At first I thought, well at least it's manageable. Now I'm not so sure.", "participant_id": "P16", "page": "p.68", "context": "Trajectory of experience"},
+        {"quote_id": "P2", "text": "My wife watches everything I eat now. It causes rows.", "participant_id": "P33", "page": "p.71", "context": "Relationship impact"}
+      ]
+    }
+  ],
+  "themes": [
+    {"theme_id": "T1", "label": "Identity disruption", "level": "descriptive", "description": "Diabetes challenges existing self-concept and social identity"},
+    {"theme_id": "T2", "label": "Daily burden of management", "level": "descriptive", "description": "Constant cognitive and practical demands of self-management"},
+    {"theme_id": "T3", "label": "Social navigation", "level": "descriptive", "description": "Managing diabetes within family, cultural, and social contexts"},
+    {"theme_id": "T4", "label": "Empowerment through knowledge", "level": "descriptive", "description": "Knowledge and self-monitoring as sources of control and anxiety"},
+    {"theme_id": "A1", "label": "Living with a contested self", "level": "analytical", "description": "Overarching theme: diabetes creates ongoing tension between the pre-diagnosis self and the 'diabetic' identity, mediated by social context and knowledge"}
+  ],
+  "cerqual_findings": [
+    {
+      "finding_id": "F1",
+      "finding_text": "People with T2DM experience diagnosis as a threat to their existing identity, resisting the label of 'diabetic' while gradually incorporating management into daily routines.",
+      "methodological_limitations": "minor", "coherence": "no", "adequacy": "no", "relevance": "no",
+      "contributing_studies": ["Bury2005", "Gomersall2011", "Peel2004", "Lawton2006"]
+    },
+    {
+      "finding_id": "F2",
+      "finding_text": "Self-management creates ongoing daily burden that participants describe as exhausting, with 'diabetes fatigue' emerging in long-term management.",
+      "methodological_limitations": "no", "coherence": "no", "adequacy": "minor", "relevance": "no",
+      "contributing_studies": ["Gomersall2011", "Bury2005", "Rise2013", "Peel2004"]
+    },
+    {
+      "finding_id": "F3",
+      "finding_text": "Dietary management is the most socially disruptive aspect, creating tension with family members and within cultural food practices.",
+      "methodological_limitations": "no", "coherence": "no", "adequacy": "no", "relevance": "minor",
+      "contributing_studies": ["Bury2005", "Peel2004", "Lawton2006"]
+    },
+    {
+      "finding_id": "F4",
+      "finding_text": "Peer support from others with diabetes is valued above professional clinical advice for day-to-day management strategies.",
+      "methodological_limitations": "minor", "coherence": "no", "adequacy": "moderate", "relevance": "no",
+      "contributing_studies": ["Rise2013", "Gomersall2011"]
+    }
+  ]
+}

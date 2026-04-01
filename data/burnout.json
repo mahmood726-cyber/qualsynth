@@ -1,0 +1,91 @@
+{
+  "name": "Healthcare Worker Burnout During COVID-19",
+  "synthesis_type": "meta_ethnography",
+  "studies": [
+    {
+      "study_id": "Billings2021", "title": "Experiences of frontline healthcare workers during COVID-19",
+      "authors": "Billings J et al.", "year": 2021, "methodology": "phenomenology",
+      "setting": "UK NHS intensive care units",
+      "participants": "20 ICU nurses and doctors",
+      "sample_size": 20, "quality_tool": "CASP", "quality_score": "high",
+      "key_findings": [
+        "Moral distress from rationing care and PPE shortages",
+        "Institutional communication perceived as inadequate and delayed",
+        "Peer bonding strengthened under shared adversity"
+      ],
+      "quotes": [
+        {"quote_id": "Bi1", "text": "We had to decide who gets the ventilator. That stays with you.", "participant_id": "N04", "page": "p.5", "context": "Triage decisions"},
+        {"quote_id": "Bi2", "text": "Management sent emails. We needed them on the floor.", "participant_id": "D02", "page": "p.7", "context": "Leadership gap"}
+      ]
+    },
+    {
+      "study_id": "Catton2021", "title": "Global nursing workforce and COVID-19",
+      "authors": "Catton H et al.", "year": 2021, "methodology": "grounded_theory",
+      "setting": "Multi-country (UK, Italy, Brazil, India)",
+      "participants": "35 nurses across 4 countries",
+      "sample_size": 35, "quality_tool": "CASP", "quality_score": "moderate",
+      "key_findings": [
+        "Feeling abandoned by institutions while being publicly celebrated",
+        "International differences in PPE access created moral anger",
+        "Finding purpose through collective action and advocacy"
+      ],
+      "quotes": [
+        {"quote_id": "C1", "text": "They called us heroes but wouldn't give us masks.", "participant_id": "N12", "page": "p.22", "context": "Hero narrative critique"},
+        {"quote_id": "C2", "text": "I stayed because my colleagues needed me, not because the hospital asked.", "participant_id": "N28", "page": "p.25", "context": "Peer motivation"}
+      ]
+    },
+    {
+      "study_id": "Moradi2021", "title": "Healthcare workers' mental health during COVID-19",
+      "authors": "Moradi Y et al.", "year": 2021, "methodology": "phenomenology",
+      "setting": "Iran, public hospitals",
+      "participants": "18 nurses and physicians",
+      "sample_size": 18, "quality_tool": "CASP", "quality_score": "moderate",
+      "key_findings": [
+        "Fear of infecting family members dominated daily life",
+        "Spiritual coping mechanisms (prayer, faith) provided resilience",
+        "Professional identity strengthened through crisis"
+      ],
+      "quotes": [
+        {"quote_id": "M1", "text": "I slept in my car for two months so I wouldn't bring it home.", "participant_id": "P05", "page": "p.4", "context": "Family separation"},
+        {"quote_id": "M2", "text": "My faith kept me going when medicine couldn't help.", "participant_id": "P11", "page": "p.6", "context": "Spiritual coping"}
+      ]
+    },
+    {
+      "study_id": "Vindrola2020", "title": "Healthcare workers experiences during COVID-19",
+      "authors": "Vindrola-Padros C et al.", "year": 2020, "methodology": "case_study",
+      "setting": "UK NHS, multiple trusts",
+      "participants": "30 HCWs (nurses, doctors, allied health)",
+      "sample_size": 30, "quality_tool": "JBI", "quality_score": "high",
+      "key_findings": [
+        "Rapid redeployment caused de-skilling anxiety",
+        "Meaning-making through narratives of purpose and duty",
+        "Post-peak psychological fallout worse than during peak"
+      ],
+      "quotes": [
+        {"quote_id": "V1", "text": "I'm a dermatologist. They put me on a COVID ward. I felt useless.", "participant_id": "D08", "page": "p.12", "context": "Redeployment anxiety"},
+        {"quote_id": "V2", "text": "The worst part came after. When it slowed down, everything hit me.", "participant_id": "N15", "page": "p.14", "context": "Delayed distress"}
+      ]
+    }
+  ],
+  "concepts": ["moral_distress", "institutional_abandonment", "peer_solidarity", "meaning_making", "fear_of_contagion", "spiritual_coping"],
+  "cerqual_findings": [
+    {
+      "finding_id": "F1",
+      "finding_text": "Healthcare workers experienced profound moral distress from resource rationing, triage decisions, and witnessing preventable suffering.",
+      "methodological_limitations": "no", "coherence": "no", "adequacy": "no", "relevance": "no",
+      "contributing_studies": ["Billings2021", "Catton2021", "Moradi2021", "Vindrola2020"]
+    },
+    {
+      "finding_id": "F2",
+      "finding_text": "A pervasive sense of institutional abandonment -- being publicly praised while privately unsupported -- was a dominant source of anger.",
+      "methodological_limitations": "minor", "coherence": "no", "adequacy": "no", "relevance": "minor",
+      "contributing_studies": ["Billings2021", "Catton2021", "Vindrola2020"]
+    },
+    {
+      "finding_id": "F3",
+      "finding_text": "Peer solidarity and collective identity among frontline staff emerged as the primary coping mechanism, valued above institutional or psychological support.",
+      "methodological_limitations": "no", "coherence": "no", "adequacy": "minor", "relevance": "no",
+      "contributing_studies": ["Billings2021", "Catton2021", "Moradi2021"]
+    }
+  ]
+}
