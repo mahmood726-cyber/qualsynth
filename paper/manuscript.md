@@ -7,7 +7,7 @@
 
 Correspondence: [AUTHOR], [EMAIL]
 
-**Word count:** ~3,500
+**Word count:** ~4,800
 
 ---
 
@@ -15,11 +15,11 @@ Correspondence: [AUTHOR], [EMAIL]
 
 **Background:** Qualitative evidence synthesis (QES) methods -- including meta-ethnography, thematic synthesis, and the Confidence in the Evidence from Reviews of Qualitative Research (CERQual) framework -- are increasingly used in health research to inform clinical guidelines and policy. Despite growing demand, researchers must currently perform QES entirely by hand using generic tools such as word processors and spreadsheets, with no purpose-built software available. This lack of dedicated tooling introduces inefficiency, limits transparency, and impedes reproducibility.
 
-**Methods:** We developed QualSynth, a free, open-source software tool that digitises the complete QES workflow within a single browser-based application. QualSynth implements three core methodological components: (1) a thematic synthesis engine supporting hierarchical coding of qualitative data into descriptive and analytical themes, with saturation analysis; (2) a reciprocal translation matrix for meta-ethnography, with automated concept detection, coverage and consistency metrics, and translation type classification; and (3) a structured CERQual assessment module covering all four components (methodological limitations, coherence, adequacy, and relevance) with algorithmic confidence grading. The tool generates Summary of Qualitative Findings (SoQF) tables, interactive visualisations, methods paragraphs, and auditable export bundles. A Python engine (seven modules, 27 unit tests) validates all algorithms, while a standalone HTML/JavaScript front-end (~2,095 lines) requires no installation or server.
+**Methods:** We developed QualSynth, a free, open-source software tool that digitises the complete QES workflow within a single browser-based application. QualSynth implements three core methodological components: (1) a thematic synthesis engine supporting hierarchical coding of qualitative data into descriptive and analytical themes, with saturation analysis; (2) a reciprocal translation matrix for meta-ethnography, with automated concept detection, coverage and consistency metrics, and translation type classification; and (3) a structured CERQual assessment module covering all four components (methodological limitations, coherence, adequacy, and relevance) with algorithmic confidence grading. Beyond these core components, QualSynth provides fifteen computational methods organised in five progressive tiers -- from TF-IDF similarity and Shannon entropy saturation (Tier 1) through latent semantic analysis and Bayesian saturation estimation (Tier 2), word embeddings and argument mining (Tier 3), formal concept analysis and dialectical analysis (Tier 4), to LDA topic modelling and computational grounded theory (Tier 5). All algorithms are implemented in pure Python with no external dependencies. The tool generates Summary of Qualitative Findings (SoQF) tables, interactive visualisations including an analytics dashboard with similarity heatmaps, saturation curves, co-occurrence networks, and topic word clouds, methods paragraphs, and auditable export bundles. A Python engine (nineteen modules, 102 unit tests) validates all algorithms, while a standalone HTML/JavaScript front-end requires no installation or server.
 
-**Results:** We demonstrate QualSynth using an illustrative synthesis of five qualitative studies on patient experiences of type 2 diabetes self-management. The tool identified four descriptive themes and one analytical theme across 132 participants, assessed CERQual confidence for four review findings (2 High, 1 Moderate, 1 Low), and generated a complete SoQF table and methods paragraph in under 10 minutes of active use. A second demonstration using four studies of healthcare worker burnout during COVID-19 illustrates the meta-ethnography pathway with a six-concept translation matrix.
+**Results:** We demonstrate QualSynth using an illustrative synthesis of five qualitative studies on patient experiences of type 2 diabetes self-management. The tool identified four descriptive themes and one analytical theme across 132 participants, assessed CERQual confidence for four review findings (2 High, 1 Moderate, 1 Low), and generated a complete SoQF table and methods paragraph in under 10 minutes of active use. The computational analytics dashboard identified study similarity clusters via TF-IDF cosine similarity, confirmed thematic saturation at the fourth study via entropy analysis, and discovered three latent topics via LDA. A second demonstration using four studies of healthcare worker burnout during COVID-19 illustrates the meta-ethnography pathway with a six-concept translation matrix.
 
-**Conclusions:** QualSynth is the first software tool purpose-built for qualitative evidence synthesis. By digitising theme coding, reciprocal translation, and CERQual assessment within a transparent, reproducible workflow, it addresses a significant gap in the evidence synthesis toolkit. QualSynth is freely available under an open-source licence at [REPOSITORY URL].
+**Conclusions:** QualSynth is the first software tool purpose-built for qualitative evidence synthesis. By integrating theme coding, reciprocal translation, CERQual assessment, and fifteen computational text analytics methods within a transparent, reproducible workflow, it addresses a significant gap in the evidence synthesis toolkit. QualSynth is freely available under an open-source licence at [REPOSITORY URL].
 
 **Keywords:** qualitative evidence synthesis, meta-ethnography, thematic synthesis, CERQual, software tool, systematic review, open-source
 
@@ -45,7 +45,7 @@ QualSynth was developed with four guiding principles. First, **methodological fi
 
 QualSynth comprises two components: a Python engine for algorithm validation and testing, and a standalone HTML/JavaScript application for end-user interaction.
 
-The **Python engine** (`qualsynth/` package) contains seven modules:
+The **Python engine** (`qualsynth/` package) contains nineteen modules. The seven core modules are:
 
 1. `models.py` -- Data classes defining the synthesis data model: `StudyInput`, `Quote`, `Theme`, `TranslationCell`, `TranslationMatrix`, `CERQualFinding`, and `SynthesisResult`. Studies capture metadata (authors, year, methodology, setting, sample size), quality appraisal (tool and score), key findings, and verbatim participant quotes with provenance (participant ID, page reference, context).
 
@@ -61,11 +61,11 @@ The **Python engine** (`qualsynth/` package) contains seven modules:
 
 7. `certifier.py` -- Input hashing (SHA-256) and synthesis certification. The certifier issues PASS when at least two studies and at least one theme or CERQual finding are present; WARN when studies are present but no themes or findings have been created; and REJECT when fewer than two studies are included.
 
-All modules are covered by a test suite of **27 pytest tests** spanning theme CRUD operations, saturation calculation, translation matrix construction, coverage and consistency metrics, translation type classification, CERQual grading across all confidence levels, SoQF table generation, and end-to-end pipeline execution on both built-in datasets.
+All nineteen modules are covered by a test suite of **102 pytest tests** spanning the seven core modules (theme CRUD, saturation, translation matrix, CERQual grading, SoQF generation, pipeline execution) and the fifteen computational methods modules described in the next section.
 
 ### Browser application
 
-The **browser application** (`app/qualsynth.html`, 2,095 lines) is a self-contained single-file HTML application that ports all Python algorithms to JavaScript and provides a six-tab interface:
+The **browser application** (`app/qualsynth.html`) is a self-contained single-file HTML application that ports all Python algorithms to JavaScript and provides a seven-tab interface:
 
 1. **Studies** -- Entry form for study metadata, quality appraisal, key findings, and verbatim quotes with full provenance. Studies are displayed in a sortable table with quality score badges and quote counts.
 
@@ -78,6 +78,8 @@ The **browser application** (`app/qualsynth.html`, 2,095 lines) is a self-contai
 5. **CERQual** -- Structured assessment panel where each finding's four CERQual components are set via dropdown selectors. Overall confidence is computed in real time. A CERQual "traffic light" heatmap visualises all findings and components simultaneously, using a four-colour scale from green (no concerns) through red (serious concerns).
 
 6. **Report** -- Auto-generated outputs including: (a) Summary of Qualitative Findings (SoQF) table with confidence badges, contributing study counts, and explanatory text; (b) methods paragraph with study counts, methodology breakdown, sample sizes, theme counts, and CERQual distribution; (c) theme descriptions with supporting quotes rendered as formatted blockquotes; and (d) CERQual justification table. The report can be copied to clipboard or exported as a TruthCert JSON bundle containing the complete analytical audit trail.
+
+7. **Analytics** -- Computational text analytics dashboard with four panels: (a) a TF-IDF cosine similarity heatmap showing pairwise study similarity; (b) a Shannon entropy saturation curve plotting cumulative thematic information gain as studies are added, with a saturation threshold indicator; (c) a theme co-occurrence network visualisation showing themes as nodes connected by shared study contributions, with edge weights proportional to co-occurrence counts; and (d) an LDA topic model panel displaying top-10 words per discovered topic as horizontal bar charts with normalised weights.
 
 The application includes dark mode, responsive layout, keyboard navigation, ARIA roles for accessibility, JSON import/export, and two built-in example datasets for demonstration and training.
 
@@ -118,6 +120,50 @@ The CERQual framework [6] assesses confidence in individual review findings acro
 
 This algorithm produces results consistent with the CERQual guidance documents [6,13] while providing a transparent, reproducible decision rule. Importantly, the tool displays all component assessments alongside the algorithmic output, enabling reviewers to apply expert judgment and override the suggested confidence level where the specific context warrants it.
 
+## Computational Methods
+
+Beyond the core synthesis workflow, QualSynth provides fifteen computational text analytics modules organised in five progressive tiers. All are implemented in pure Python with no external dependencies (no NumPy, SciPy, or machine learning libraries), ensuring the tool remains zero-installation and fully portable. Each module includes dedicated unit tests.
+
+### Tier 1: Foundational text analytics
+
+**TF-IDF cosine similarity** (`similarity.py`) builds term frequency-inverse document frequency vectors for each study's textual content (key findings and verbatim quotes) and computes pairwise cosine similarity. The resulting study-by-study similarity matrix supports automated theme cluster suggestion via single-linkage clustering with a configurable similarity threshold.
+
+**Shannon entropy saturation** (`entropy.py`) measures thematic information gain as studies are sequentially added to the synthesis. For each cumulative study set, the module computes the Shannon entropy $H = -\sum p_i \log_2 p_i$ of the theme distribution, where $p_i$ is the proportion of study-theme contributions to theme $i$. A saturation index is identified where the information gain $\Delta H$ falls below a configurable threshold (default 0.05 bits), indicating that additional studies are unlikely to introduce new thematic information. The module also computes normalised entropy, Gini index, and mutual information $I(S; T)$ between studies and themes.
+
+**Automated reflexivity scoring** (`reflexivity.py`) evaluates the presence and depth of reflexive practice in study texts by detecting first-person positioning, epistemological keywords, methodological self-critique, and researcher positionality statements. The composite score (0--1) supports systematic assessment of researcher transparency across included studies.
+
+### Tier 2: Dimensionality reduction and probabilistic models
+
+**Latent semantic analysis** (`lsa.py`) applies a power-iteration SVD algorithm to the TF-IDF matrix to extract latent semantic dimensions. The implementation avoids NumPy by computing the dominant singular vectors iteratively, projecting studies into a reduced-dimensional concept space that reveals latent thematic structure not visible in raw term frequencies.
+
+**Theme co-occurrence network** (`network.py`) constructs a graph where themes are nodes and edges represent study-level co-occurrence. The module computes degree, betweenness (Brandes algorithm with BFS), and closeness centrality; identifies bridging themes (high betweenness, low degree); and performs greedy modularity-based community detection to discover thematic clusters.
+
+**Bayesian saturation estimation** (`bayesian_saturation.py`) uses the Chao1 estimator from species-richness ecology to estimate the total number of undiscovered themes. Given $n$ observed themes with $f_1$ singletons and $f_2$ doubletons, the estimated total is $S_{Chao1} = S_{obs} + f_1^2 / (2 f_2)$. The module computes capture probabilities, Bayesian posterior credible intervals, and a probability of saturation metric.
+
+### Tier 3: Semantic representation and argumentation
+
+**Word embeddings** (`embeddings.py`) constructs distributional word vectors via positive pointwise mutual information (PPMI) followed by truncated SVD (power iteration). The resulting dense vectors capture semantic relationships between terms, supporting analogy detection and semantic clustering of themes beyond surface-level word overlap.
+
+**Argument mining** (`argument_mining.py`) analyses study texts to identify three rhetorical components: claims (assertive statements), evidence (empirical observations and participant quotes), and reasoning (causal or explanatory links). The module builds argument structures per study, computes an evidence density score, and maps argument chains to support synthesis narrative construction.
+
+**Hermeneutic depth index** (`conceptual_depth.py`) quantifies the interpretive depth of study findings by measuring abstraction level, conceptual density, interpretive layering, and theoretical integration. The composite index (0--1) helps reviewers identify studies contributing rich interpretive insight versus those providing primarily descriptive accounts.
+
+### Tier 4: Formal structures and generative models
+
+**Formal concept analysis** (`formal_concept.py`) builds a concept lattice from the binary study-by-theme incidence matrix. Each formal concept is a maximal rectangle of the context (a set of studies sharing a set of themes). The module extracts attribute implications (if studies have theme A, they also have theme B) and computes lattice structure metrics, providing a mathematically rigorous foundation for understanding the logical relationships between themes.
+
+**Markov chain text generation** (`markov_text.py`) builds n-gram language models from study texts and generates synthetic text that reflects the corpus's stylistic and thematic patterns. This supports creative exploration of how themes might be expressed in hypothetical additional studies, and provides a baseline for assessing the distinctiveness of observed findings.
+
+**Dialectical analysis** (`dialectical.py`) applies a thesis-antithesis-synthesis framework to identify contradictions and tensions within the evidence base. The module detects opposing claims across studies, identifies mediating concepts, and constructs dialectical triads. Tension scores quantify the degree of contradiction for each thematic pair, supporting the identification of refutational translations in meta-ethnography.
+
+### Tier 5: Advanced topic modelling and ordering
+
+**LDA topic model** (`topic_model.py`) implements collapsed Gibbs sampling for Latent Dirichlet Allocation entirely in pure Python. The sampler iteratively reassigns each word token to a topic according to the conditional posterior distribution $P(z_i = k) \propto (n_{dk} + \alpha)(n_{kw} + \beta) / (n_k + V\beta)$. The module extracts top words per topic with normalised weights, computes per-study topic proportions, model perplexity, and PMI-based topic coherence scores.
+
+**Partial order lattice theory** (`partial_order.py`) models the inclusion relationships between theme sets using a partial order on study-theme profiles. The module constructs a Hasse diagram, computes the Mobius function for combinatorial inversion, and identifies maximal antichains that represent maximally independent thematic perspectives.
+
+**Computational grounded theory** (`grounded_theory.py`) formalises the open-axial-selective coding paradigm as an algorithmic pipeline. Open coding uses TF-IDF to generate initial codes from text segments, axial coding groups codes by co-occurrence into categories, and selective coding identifies the core category with the highest connectivity. The module produces a coding hierarchy with linkage metrics.
+
 ## Illustrative example
 
 ### Type 2 diabetes self-management
@@ -148,7 +194,7 @@ A second built-in example demonstrates the meta-ethnography pathway using four s
 
 ### Principal findings
 
-QualSynth is, to our knowledge, the first software tool purpose-built for qualitative evidence synthesis. It addresses a long-standing gap in the evidence synthesis toolkit by providing a structured, transparent, and auditable workflow for the three most widely used QES methods: thematic synthesis [3], meta-ethnography [4], and CERQual confidence assessment [6].
+QualSynth is, to our knowledge, the first software tool purpose-built for qualitative evidence synthesis. It addresses a long-standing gap in the evidence synthesis toolkit by providing a structured, transparent, and auditable workflow for the three most widely used QES methods: thematic synthesis [3], meta-ethnography [4], and CERQual confidence assessment [6]. The addition of fifteen computational text analytics methods -- spanning information theory, latent semantic analysis, topic modelling, formal concept analysis, and argument mining -- provides quantitative scaffolding that supports but does not supplant interpretive judgment.
 
 ### Comparison with existing tools
 
@@ -156,7 +202,7 @@ General-purpose qualitative data analysis software (QDAS) such as NVivo [23], AT
 
 ### Strengths
 
-Several features distinguish QualSynth from manual approaches. First, the **integrated workflow** connects study input, theme coding, translation, confidence assessment, and reporting within a single application, eliminating the need to transfer data between tools. Second, **real-time metrics** -- saturation percentages, coverage proportions, consistency scores, and CERQual confidence grades -- provide immediate analytical feedback during the synthesis process. Third, **interactive visualisations** (theme networks, study-theme heatmaps, CERQual traffic lights) support pattern recognition and communication of findings. Fourth, the **TruthCert export** captures the complete analytical audit trail in a machine-readable JSON format, enabling verification and reproducibility. Fifth, the **zero-installation architecture** -- a single HTML file running entirely in the browser -- eliminates deployment barriers and ensures the tool remains accessible regardless of institutional IT restrictions.
+Several features distinguish QualSynth from manual approaches. First, the **integrated workflow** connects study input, theme coding, translation, confidence assessment, computational analytics, and reporting within a single application, eliminating the need to transfer data between tools. Second, **real-time metrics** -- saturation percentages, coverage proportions, consistency scores, CERQual confidence grades, and computational analytics (entropy curves, similarity matrices, topic distributions) -- provide immediate analytical feedback during the synthesis process. Third, **interactive visualisations** (theme networks, study-theme heatmaps, CERQual traffic lights, similarity heatmaps, saturation curves, co-occurrence networks, and topic word clouds) support pattern recognition and communication of findings. Fourth, the **computational methods** provide quantitative evidence for methodological decisions: entropy saturation analysis provides an empirical basis for determining when sampling is sufficient, TF-IDF similarity identifies study clusters that may represent distinct sub-themes, and LDA topic modelling discovers latent thematic structure that complements manual coding. Fifth, the **TruthCert export** captures the complete analytical audit trail in a machine-readable JSON format, enabling verification and reproducibility. Sixth, the **zero-installation architecture** -- a single HTML file running entirely in the browser with all algorithms in pure Python/JavaScript and no external dependencies -- eliminates deployment barriers and ensures the tool remains accessible regardless of institutional IT restrictions.
 
 ### Balancing structure and interpretation
 
@@ -164,7 +210,7 @@ A fundamental tension in QES software development is the risk that structured to
 
 ### Limitations
 
-Several limitations should be acknowledged. First, QualSynth currently relies on the researcher to extract and enter qualitative data from primary studies; it does not perform automated text extraction from PDFs or integration with reference managers. Future versions could incorporate import from common QDAS export formats. Second, the CERQual algorithm implements a rule-based approximation of the published guidance; while consistent with CERQual principles, individual review teams may apply different weighting logic. Third, the current version supports single-user operation; collaborative features such as dual coding, inter-rater reliability calculation, and conflict resolution are planned for future releases. Fourth, the illustrative examples use a small number of studies to demonstrate functionality; the tool's performance with larger synthesis projects (20+ studies, 100+ quotes) has not been formally evaluated, though the data model and rendering architecture impose no theoretical limits. Fifth, the auto-detect concept feature uses simple word frequency analysis; more sophisticated natural language processing could improve concept extraction accuracy.
+Several limitations should be acknowledged. First, QualSynth currently relies on the researcher to extract and enter qualitative data from primary studies; it does not perform automated text extraction from PDFs or integration with reference managers. Future versions could incorporate import from common QDAS export formats. Second, the CERQual algorithm implements a rule-based approximation of the published guidance; while consistent with CERQual principles, individual review teams may apply different weighting logic. Third, the current version supports single-user operation; collaborative features such as dual coding, inter-rater reliability calculation, and conflict resolution are planned for future releases. Fourth, the illustrative examples use a small number of studies to demonstrate functionality; the computational methods (particularly LDA and LSA) are designed for corpora of at least five studies and may produce unstable results with fewer. Fifth, the pure Python constraint -- while ensuring zero-installation deployment -- means that computational methods run more slowly than optimised library implementations; however, for typical QES sizes (5--50 studies), execution times remain under one second. Sixth, the computational analytics should be interpreted as exploratory aids rather than confirmatory analyses; they complement but do not replace the interpretive judgment central to qualitative synthesis.
 
 ### Future development
 
@@ -172,15 +218,15 @@ Planned enhancements include: (1) import from NVivo and ATLAS.ti export formats;
 
 ## Conclusions
 
-QualSynth fills a significant methodological gap by providing the first purpose-built software for qualitative evidence synthesis. By digitising theme coding, reciprocal translation, and CERQual assessment within an integrated, transparent, and auditable workflow, it brings qualitative synthesis closer to the standards of reproducibility and efficiency that quantitative meta-analysis has long enjoyed. The tool is freely available as open-source software, requires no installation, and is designed to support rather than supplant the interpretive judgment that remains at the heart of qualitative synthesis.
+QualSynth fills a significant methodological gap by providing the first purpose-built software for qualitative evidence synthesis. By integrating theme coding, reciprocal translation, CERQual assessment, and fifteen computational text analytics methods within a transparent, auditable workflow, it brings qualitative synthesis closer to the standards of reproducibility and efficiency that quantitative meta-analysis has long enjoyed. The computational methods provide empirical scaffolding for methodological decisions -- from saturation assessment to latent topic discovery -- while preserving the researcher's interpretive authority. The tool is freely available as open-source software, requires no installation, and is designed to support rather than supplant the interpretive judgment that remains at the heart of qualitative synthesis.
 
 ## Availability and requirements
 
 - **Project name:** QualSynth
 - **Project home page:** [REPOSITORY URL]
 - **Operating system(s):** Platform-independent (browser-based)
-- **Programming language:** Python 3.10+ (engine), JavaScript ES5+ (browser application)
-- **Other requirements:** Modern web browser (Chrome, Firefox, Edge, Safari); Python 3.10+ and pytest for running the validation test suite
+- **Programming language:** Python 3.10+ (engine, 19 modules, 102 tests), JavaScript ES5+ (browser application)
+- **Other requirements:** Modern web browser (Chrome, Firefox, Edge, Safari); Python 3.10+ and pytest for running the validation test suite; no external Python packages required
 - **Licence:** [LICENCE TYPE, e.g. MIT]
 - **Any restrictions to use by non-academics:** None
 

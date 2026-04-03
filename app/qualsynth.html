@@ -328,6 +328,7 @@ body.dark .cell-partial { background: #854d0e; color: #fef9c3; }
   <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-synthesis" id="tab-synthesis" onclick="switchTab('synthesis')">Synthesis</button>
   <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-cerqual" id="tab-cerqual" onclick="switchTab('cerqual')">CERQual</button>
   <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-report" id="tab-report" onclick="switchTab('report')">Report</button>
+  <button class="tab-btn" role="tab" aria-selected="false" aria-controls="panel-analytics" id="tab-analytics" onclick="switchTab('analytics')">Analytics</button>
 </nav>
 
 <main class="main-content">
@@ -525,6 +526,39 @@ body.dark .cell-partial { background: #854d0e; color: #fef9c3; }
     <div id="cerqual-justification"></div>
   </div>
 </div>
+
+<!-- ===== TAB 7: ANALYTICS ===== -->
+<div class="tab-panel" id="panel-analytics" role="tabpanel" aria-labelledby="tab-analytics">
+  <div class="flex-between mb-2">
+    <h3>Computational Analytics</h3>
+    <button class="btn btn-sm btn-primary" onclick="runAllAnalytics()">Run All Analytics</button>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <h3>Study Similarity (TF-IDF Cosine)</h3>
+      <div class="chart-container" id="chart-similarity-heatmap"></div>
+    </div>
+    <div class="card">
+      <h3>Entropy Saturation Curve</h3>
+      <div class="chart-container" id="chart-saturation-curve"></div>
+    </div>
+  </div>
+  <div class="grid-2 mt-2">
+    <div class="card">
+      <h3>Theme Co-occurrence Network</h3>
+      <div class="chart-container" id="chart-cooccurrence-network"></div>
+    </div>
+    <div class="card">
+      <h3>LDA Topic Model</h3>
+      <div style="margin-bottom:8px;">
+        <label for="lda-n-topics" style="display:inline;margin-right:8px;">Topics:</label>
+        <input type="number" id="lda-n-topics" min="2" max="10" value="3" style="width:70px;display:inline;margin-bottom:0;">
+        <button class="btn btn-sm" onclick="runLDAAnalytics()" style="margin-left:8px;">Run LDA</button>
+      </div>
+      <div id="chart-lda-topics"></div>
+    </div>
+  </div>
+</div>
 </main>
 
 <!-- Status bar -->
@@ -650,6 +684,7 @@ function switchTab(tabName) {
   if (tabName === 'synthesis') { renderSynthesis(); renderThemeNetworkChart(); }
   if (tabName === 'cerqual') { renderCerqualPanel(); renderCerqualTrafficLight(); }
   if (tabName === 'report') { renderReport(); }
+  if (tabName === 'analytics') { runAllAnalytics(); }
 }
 
 // ---- MODAL HELPERS ----
@@ -1529,6 +1564,7 @@ function replotAll() {
     if (tabName === 'translation') { renderStudyThemeChart(); }
     if (tabName === 'synthesis') { renderThemeNetworkChart(); }
     if (tabName === 'cerqual') { renderCerqualTrafficLight(); }
+    if (tabName === 'analytics') { runAllAnalytics(); }
   }
 }
 
@@ -2086,6 +2122,566 @@ document.addEventListener('keydown', function(e) {
     modals.forEach(function(m) { m.classList.remove('active'); });
   }
 });
+
+// ---- ANALYTICS ENGINES (ported from Python) ----
+
+// -- Stopwords --
+var STOPWORDS_SET = {};
+["a","about","above","after","again","against","all","am","an","and","any","are","as","at","be","because","been","before","being","below","between","both","but","by","can","could","did","do","does","doing","down","during","each","few","for","from","further","get","got","had","has","have","having","he","her","here","hers","herself","him","himself","his","how","i","if","in","into","is","it","its","itself","just","me","might","more","most","must","my","myself","no","nor","not","now","of","off","on","once","only","or","other","our","ours","ourselves","out","over","own","s","same","she","should","so","some","such","t","than","that","the","their","theirs","them","themselves","then","there","these","they","this","those","through","to","too","under","until","up","very","was","we","were","what","when","where","which","while","who","whom","why","will","with","would","you","your","yours","yourself","yourselves"].forEach(function(w) { STOPWORDS_SET[w] = true; });
+
+function analyticsTokenize(text) {
+  var tokens = text.toLowerCase().split(/[^a-zA-Z]+/);
+  return tokens.filter(function(t) { return t.length > 1 && !STOPWORDS_SET[t]; });
+}
+
+function getStudyText(study) {
+  var parts = study.key_findings.slice();
+  study.quotes.forEach(function(q) { parts.push(q.text); });
+  return parts.join(' ');
+}
+
+// -- TF-IDF --
+function computeTFIDF(studies) {
+  var docTokens = [];
+  var vocabSet = {};
+  studies.forEach(function(s) {
+    var tokens = analyticsTokenize(getStudyText(s));
+    docTokens.push(tokens);
+    tokens.forEach(function(t) { vocabSet[t] = true; });
+  });
+  var vocabulary = Object.keys(vocabSet).sort();
+  var nDocs = studies.length;
+
+  // Document frequency
+  var df = {};
+  docTokens.forEach(function(tokens) {
+    var seen = {};
+    tokens.forEach(function(t) { seen[t] = true; });
+    Object.keys(seen).forEach(function(t) { df[t] = (df[t] || 0) + 1; });
+  });
+
+  // IDF
+  var idf = {};
+  vocabulary.forEach(function(t) {
+    idf[t] = Math.log(nDocs / (1 + (df[t] || 0)));
+  });
+
+  // TF-IDF vectors
+  var docVectors = [];
+  docTokens.forEach(function(tokens) {
+    var nTokens = tokens.length;
+    if (nTokens === 0) { docVectors.push({}); return; }
+    var freq = {};
+    tokens.forEach(function(t) { freq[t] = (freq[t] || 0) + 1; });
+    var vec = {};
+    Object.keys(freq).forEach(function(t) {
+      vec[t] = (freq[t] / nTokens) * (idf[t] || 0);
+    });
+    docVectors.push(vec);
+  });
+
+  return { docVectors: docVectors, vocabulary: vocabulary };
+}
+
+function cosineSimilarity(vecA, vecB) {
+  var keysA = Object.keys(vecA);
+  var dot = 0, magA = 0, magB = 0;
+  keysA.forEach(function(k) { magA += vecA[k] * vecA[k]; });
+  Object.keys(vecB).forEach(function(k) { magB += vecB[k] * vecB[k]; });
+  keysA.forEach(function(k) {
+    if (vecB[k] !== undefined) { dot += vecA[k] * vecB[k]; }
+  });
+  magA = Math.sqrt(magA);
+  magB = Math.sqrt(magB);
+  if (magA === 0 || magB === 0) return 0;
+  return dot / (magA * magB);
+}
+
+function buildSimilarityMatrix(studies) {
+  var result = computeTFIDF(studies);
+  var vecs = result.docVectors;
+  var n = studies.length;
+  var matrix = [];
+  for (var i = 0; i < n; i++) {
+    matrix.push([]);
+    for (var j = 0; j < n; j++) {
+      if (i === j) { matrix[i].push(1.0); }
+      else if (j < i) { matrix[i].push(matrix[j][i]); }
+      else { matrix[i].push(cosineSimilarity(vecs[i], vecs[j])); }
+    }
+  }
+  return matrix;
+}
+
+// -- Shannon Entropy Saturation --
+function shannonEntropy(counts) {
+  var total = 0;
+  counts.forEach(function(c) { total += c; });
+  if (total === 0) return 0;
+  var h = 0;
+  counts.forEach(function(c) {
+    if (c > 0) {
+      var p = c / total;
+      h -= p * Math.log2(p);
+    }
+  });
+  return h;
+}
+
+function computeSaturationCurve(studies, themes, threshold) {
+  if (threshold === undefined) threshold = 0.05;
+  var n = studies.length;
+  var entropyCurve = [];
+  var infoGain = [];
+  var saturationIndex = null;
+
+  for (var i = 1; i <= n; i++) {
+    var includedIds = {};
+    for (var s = 0; s < i; s++) { includedIds[studies[s].study_id] = true; }
+    // Theme distribution: count how many included studies contribute to each theme
+    var counts = themes.map(function(t) {
+      var count = 0;
+      t.assigned_studies.forEach(function(sid) {
+        if (includedIds[sid]) count++;
+      });
+      return count;
+    });
+    var h = shannonEntropy(counts);
+    entropyCurve.push(h);
+
+    if (i === 1) {
+      infoGain.push(h);
+    } else {
+      infoGain.push(h - entropyCurve[i - 2]);
+    }
+
+    if (saturationIndex === null && i > 1 && Math.abs(infoGain[infoGain.length - 1]) < threshold) {
+      saturationIndex = i;
+    }
+  }
+
+  return {
+    entropyCurve: entropyCurve,
+    infoGain: infoGain,
+    saturationIndex: saturationIndex
+  };
+}
+
+// -- Theme Co-occurrence Network --
+function buildCooccurrenceMatrix(themes) {
+  var k = themes.length;
+  var themeStudies = themes.map(function(t) {
+    var s = {};
+    t.assigned_studies.forEach(function(sid) { s[sid] = true; });
+    return s;
+  });
+  var matrix = [];
+  for (var i = 0; i < k; i++) {
+    matrix.push([]);
+    for (var j = 0; j < k; j++) {
+      if (j < i) {
+        matrix[i].push(matrix[j][i]);
+      } else {
+        var count = 0;
+        Object.keys(themeStudies[i]).forEach(function(sid) {
+          if (themeStudies[j][sid]) count++;
+        });
+        matrix[i].push(count);
+      }
+    }
+  }
+  return matrix;
+}
+
+// -- LDA (collapsed Gibbs, seeded PRNG) --
+function seededRandom(seed) {
+  // Simple xorshift32 PRNG
+  var state = seed || 42;
+  return function() {
+    state ^= state << 13;
+    state ^= state >> 17;
+    state ^= state << 5;
+    return (state >>> 0) / 4294967296;
+  };
+}
+
+function runLDA(studies, nTopics, nIter, seed) {
+  if (!nTopics) nTopics = 3;
+  if (!nIter) nIter = 200;
+  if (!seed) seed = 42;
+  var alpha = 0.1, beta = 0.01;
+  var rng = seededRandom(seed);
+
+  // Build corpus
+  var vocabSet = {};
+  var rawDocs = [];
+  studies.forEach(function(s) {
+    var tokens = analyticsTokenize(getStudyText(s));
+    rawDocs.push(tokens);
+    tokens.forEach(function(t) { vocabSet[t] = true; });
+  });
+  var vocab = Object.keys(vocabSet).sort();
+  var word2id = {};
+  vocab.forEach(function(w, i) { word2id[w] = i; });
+  var V = vocab.length;
+  var D = studies.length;
+  var K = nTopics;
+
+  if (V === 0 || D === 0) {
+    return { topics: [], studyProportions: {} };
+  }
+
+  var docs = rawDocs.map(function(tokens) {
+    return tokens.map(function(t) { return word2id[t]; });
+  });
+
+  // Initialize counts
+  var nDK = [];
+  for (var d = 0; d < D; d++) { nDK.push(new Array(K).fill(0)); }
+  var nKW = [];
+  for (var kk = 0; kk < K; kk++) { nKW.push(new Array(V).fill(0)); }
+  var nK = new Array(K).fill(0);
+
+  // Random initial topic assignments
+  var z = [];
+  for (var d = 0; d < D; d++) {
+    var zDoc = [];
+    for (var n = 0; n < docs[d].length; n++) {
+      var kInit = Math.floor(rng() * K);
+      zDoc.push(kInit);
+      var w = docs[d][n];
+      nDK[d][kInit]++;
+      nKW[kInit][w]++;
+      nK[kInit]++;
+    }
+    z.push(zDoc);
+  }
+
+  var VBeta = V * beta;
+
+  // Gibbs iterations
+  for (var iter = 0; iter < nIter; iter++) {
+    for (var d = 0; d < D; d++) {
+      for (var n = 0; n < docs[d].length; n++) {
+        var w = docs[d][n];
+        var kOld = z[d][n];
+        nDK[d][kOld]--;
+        nKW[kOld][w]--;
+        nK[kOld]--;
+
+        var probs = [];
+        var probTotal = 0;
+        for (var kk = 0; kk < K; kk++) {
+          var p = (nDK[d][kk] + alpha) * (nKW[kk][w] + beta) / (nK[kk] + VBeta);
+          probs.push(p);
+          probTotal += p;
+        }
+
+        var r = rng() * probTotal;
+        var cumulative = 0;
+        var kNew = K - 1;
+        for (var kk = 0; kk < K; kk++) {
+          cumulative += probs[kk];
+          if (r < cumulative) { kNew = kk; break; }
+        }
+
+        z[d][n] = kNew;
+        nDK[d][kNew]++;
+        nKW[kNew][w]++;
+        nK[kNew]++;
+      }
+    }
+  }
+
+  // Extract topics: top 10 words per topic
+  var topics = [];
+  for (var kk = 0; kk < K; kk++) {
+    var total = nK[kk];
+    if (total === 0) { topics.push({ topicId: kk, topWords: [] }); continue; }
+    var wordWeights = [];
+    for (var ww = 0; ww < V; ww++) {
+      if (nKW[kk][ww] > 0) {
+        wordWeights.push({ word: vocab[ww], weight: nKW[kk][ww] / total });
+      }
+    }
+    wordWeights.sort(function(a, b) { return b.weight - a.weight; });
+    topics.push({ topicId: kk, topWords: wordWeights.slice(0, 10) });
+  }
+
+  // Study topic proportions
+  var studyProportions = {};
+  studies.forEach(function(s, d) {
+    var docTotal = 0;
+    for (var kk = 0; kk < K; kk++) docTotal += nDK[d][kk];
+    docTotal += K * alpha;
+    var props = [];
+    for (var kk = 0; kk < K; kk++) {
+      props.push((nDK[d][kk] + alpha) / docTotal);
+    }
+    studyProportions[s.study_id] = props;
+  });
+
+  return { topics: topics, studyProportions: studyProportions };
+}
+
+// ---- ANALYTICS RENDERING ----
+
+function runAllAnalytics() {
+  renderSimilarityHeatmap();
+  renderSaturationCurve();
+  renderCooccurrenceNetwork();
+  // Do not auto-run LDA (expensive), just show placeholder if not run yet
+  var ldaContainer = document.getElementById('chart-lda-topics');
+  if (!ldaContainer.hasAttribute('data-rendered')) {
+    ldaContainer.innerHTML = '<p class="text-muted">Click "Run LDA" to discover latent topics.</p>';
+  }
+}
+
+function renderSimilarityHeatmap() {
+  var container = document.getElementById('chart-similarity-heatmap');
+  if (appState.studies.length < 2) {
+    container.innerHTML = '<p class="text-muted">Add at least 2 studies to compute similarity.</p>';
+    return;
+  }
+
+  var matrix = buildSimilarityMatrix(appState.studies);
+  var studyIds = appState.studies.map(function(s) { return s.study_id; });
+
+  // Round for display
+  var zRounded = matrix.map(function(row) {
+    return row.map(function(v) { return Math.round(v * 1000) / 1000; });
+  });
+
+  var trace = {
+    z: zRounded,
+    x: studyIds,
+    y: studyIds,
+    type: 'heatmap',
+    colorscale: [[0, '#f0fdfa'], [0.5, '#5eead4'], [1, '#0f766e']],
+    showscale: true,
+    hovertemplate: '%{y} vs %{x}<br>Similarity: %{z:.3f}<extra></extra>',
+    text: zRounded,
+    texttemplate: '%{z:.2f}',
+    textfont: { size: 11 }
+  };
+
+  var layout = getPlotlyLayout('TF-IDF Cosine Similarity');
+  layout.xaxis = { title: '', tickangle: -45 };
+  layout.yaxis = { title: '' };
+  layout.margin = { t: 40, r: 20, b: 80, l: 100 };
+
+  Plotly.newPlot(container, [trace], layout, { responsive: true });
+}
+
+function renderSaturationCurve() {
+  var container = document.getElementById('chart-saturation-curve');
+  if (appState.studies.length < 2 || appState.themes.length === 0) {
+    container.innerHTML = '<p class="text-muted">Add at least 2 studies with coded themes to compute saturation.</p>';
+    return;
+  }
+
+  var result = computeSaturationCurve(appState.studies, appState.themes);
+  var xLabels = appState.studies.map(function(s, i) { return (i + 1) + ': ' + s.study_id; });
+
+  var isDark = document.body.classList.contains('dark');
+
+  var entropyTrace = {
+    x: xLabels,
+    y: result.entropyCurve,
+    mode: 'lines+markers',
+    name: 'Entropy (H)',
+    line: { color: '#0f766e', width: 3 },
+    marker: { size: 8 },
+    type: 'scatter'
+  };
+
+  var gainTrace = {
+    x: xLabels,
+    y: result.infoGain,
+    mode: 'lines+markers',
+    name: 'Info Gain (\u0394H)',
+    line: { color: '#f97316', width: 2, dash: 'dash' },
+    marker: { size: 6 },
+    yaxis: 'y2',
+    type: 'scatter'
+  };
+
+  var layout = getPlotlyLayout('Entropy Saturation Curve');
+  layout.xaxis = { title: 'Study (cumulative)', tickangle: -30 };
+  layout.yaxis = { title: 'Shannon Entropy (bits)', side: 'left' };
+  layout.yaxis2 = {
+    title: 'Information Gain',
+    overlaying: 'y',
+    side: 'right',
+    showgrid: false,
+    titlefont: { color: '#f97316' },
+    tickfont: { color: '#f97316' }
+  };
+  layout.legend = { x: 0.01, y: 0.99, bgcolor: 'rgba(0,0,0,0)' };
+  layout.margin = { t: 40, r: 60, b: 80, l: 60 };
+
+  var shapes = [];
+  if (result.saturationIndex !== null) {
+    shapes.push({
+      type: 'line',
+      x0: xLabels[result.saturationIndex - 1],
+      x1: xLabels[result.saturationIndex - 1],
+      y0: 0,
+      y1: 1,
+      yref: 'paper',
+      line: { color: '#ef4444', width: 2, dash: 'dot' }
+    });
+    layout.annotations = [{
+      x: xLabels[result.saturationIndex - 1],
+      y: 1.05,
+      yref: 'paper',
+      text: 'Saturation',
+      showarrow: false,
+      font: { color: '#ef4444', size: 11 }
+    }];
+  }
+  layout.shapes = shapes;
+
+  Plotly.newPlot(container, [entropyTrace, gainTrace], layout, { responsive: true });
+}
+
+function renderCooccurrenceNetwork() {
+  var container = document.getElementById('chart-cooccurrence-network');
+  if (appState.themes.length < 2) {
+    container.innerHTML = '<p class="text-muted">Add at least 2 themes with coded studies to see the network.</p>';
+    return;
+  }
+
+  var cooc = buildCooccurrenceMatrix(appState.themes);
+  var k = appState.themes.length;
+  var isDark = document.body.classList.contains('dark');
+
+  // Position nodes in a circle
+  var xs = [];
+  var ys = [];
+  for (var i = 0; i < k; i++) {
+    xs.push(Math.cos(2 * Math.PI * i / k));
+    ys.push(Math.sin(2 * Math.PI * i / k));
+  }
+
+  // Build edges
+  var edgeXs = [];
+  var edgeYs = [];
+  var edgeWeights = [];
+  for (var i = 0; i < k; i++) {
+    for (var j = i + 1; j < k; j++) {
+      if (cooc[i][j] > 0) {
+        edgeXs.push(xs[i], xs[j], null);
+        edgeYs.push(ys[i], ys[j], null);
+        edgeWeights.push(cooc[i][j]);
+      }
+    }
+  }
+
+  var edgeTrace = {
+    x: edgeXs,
+    y: edgeYs,
+    mode: 'lines',
+    line: { width: 2, color: isDark ? '#64748b' : '#94a3b8' },
+    hoverinfo: 'none',
+    type: 'scatter'
+  };
+
+  // Compute degree for node sizing
+  var degrees = [];
+  for (var i = 0; i < k; i++) {
+    var deg = 0;
+    for (var j = 0; j < k; j++) {
+      if (i !== j && cooc[i][j] > 0) deg++;
+    }
+    degrees.push(deg);
+  }
+
+  var nodeTrace = {
+    x: xs,
+    y: ys,
+    mode: 'markers+text',
+    marker: {
+      size: degrees.map(function(d) { return Math.max(15, 10 + d * 8); }),
+      color: appState.themes.map(function(t) { return t.level === 'analytical' ? '#eab308' : '#0f766e'; }),
+      line: { width: 2, color: isDark ? '#1e293b' : '#ffffff' }
+    },
+    text: appState.themes.map(function(t) { return t.label; }),
+    textposition: 'top center',
+    textfont: { size: 11 },
+    hovertext: appState.themes.map(function(t, i) {
+      return t.label + ' (' + t.level + ')<br>Degree: ' + degrees[i] + '<br>Studies: ' + t.assigned_studies.length;
+    }),
+    hoverinfo: 'text',
+    type: 'scatter'
+  };
+
+  var layout = getPlotlyLayout('Theme Co-occurrence Network');
+  layout.showlegend = false;
+  layout.xaxis = { showgrid: false, zeroline: false, showticklabels: false };
+  layout.yaxis = { showgrid: false, zeroline: false, showticklabels: false };
+
+  Plotly.newPlot(container, [edgeTrace, nodeTrace], layout, { responsive: true });
+}
+
+function runLDAAnalytics() {
+  var container = document.getElementById('chart-lda-topics');
+  if (appState.studies.length < 2) {
+    container.innerHTML = '<p class="text-muted">Add at least 2 studies to run LDA.</p>';
+    return;
+  }
+
+  var nTopics = parseInt(document.getElementById('lda-n-topics').value) || 3;
+  container.innerHTML = '<p class="text-muted">Running LDA with ' + nTopics + ' topics...</p>';
+
+  // Use setTimeout to let the UI update before running expensive computation
+  setTimeout(function() {
+    var result = runLDA(appState.studies, nTopics, 200, 42);
+
+    if (result.topics.length === 0) {
+      container.innerHTML = '<p class="text-muted">No topics found. Studies may have insufficient text.</p>';
+      return;
+    }
+
+    // Render each topic as a horizontal bar chart
+    var isDark = document.body.classList.contains('dark');
+    var html = '';
+    result.topics.forEach(function(topic) {
+      var chartId = 'lda-topic-chart-' + topic.topicId;
+      html += '<div id="' + chartId + '" style="min-height:200px;margin-bottom:12px;"></div>';
+    });
+    container.innerHTML = html;
+    container.setAttribute('data-rendered', '1');
+
+    result.topics.forEach(function(topic) {
+      var chartId = 'lda-topic-chart-' + topic.topicId;
+      var words = topic.topWords.slice().reverse();
+      if (words.length === 0) return;
+
+      var trace = {
+        y: words.map(function(w) { return w.word; }),
+        x: words.map(function(w) { return Math.round(w.weight * 1000) / 1000; }),
+        type: 'bar',
+        orientation: 'h',
+        marker: {
+          color: ['#0f766e', '#14b8a6', '#2dd4bf', '#5eead4', '#99f6e4',
+                  '#0d9488', '#0f766e', '#14b8a6', '#2dd4bf', '#5eead4'].slice(0, words.length)
+        },
+        hovertemplate: '%{y}: %{x:.3f}<extra></extra>'
+      };
+
+      var layout = getPlotlyLayout('Topic ' + (topic.topicId + 1));
+      layout.xaxis = { title: 'Weight' };
+      layout.yaxis = { title: '' };
+      layout.margin = { t: 30, r: 20, b: 40, l: 100 };
+      layout.height = 200;
+
+      Plotly.newPlot(chartId, [trace], layout, { responsive: true });
+    });
+
+    updateStatus('LDA complete: ' + nTopics + ' topics discovered');
+  }, 50);
+}
 
 // ---- INIT ----
 renderStudyTable();
