@@ -19,7 +19,7 @@ body{
 }
 .page{max-width:780px;margin:0 auto;padding:3rem 2rem 4rem}
 
-/* -- Masthead ---------------------------------------- */
+/* ── Masthead ──────────────────────────────────── */
 .masthead{
   text-align:center;padding:2rem 0 1.5rem;
   border-bottom:3px double var(--border);margin-bottom:2.5rem
@@ -35,7 +35,7 @@ body{
 }
 .masthead .byline a{color:var(--link);text-decoration:none}
 
-/* -- Body -------------------------------------------- */
+/* ── Body ──────────────────────────────────────── */
 .body-section{margin-bottom:3rem}
 .body-text{
   font-size:1.18rem;line-height:2;text-align:justify;hyphens:auto;
@@ -69,7 +69,7 @@ body{
 .body-text .s[data-r="6"]::after{background:var(--s6)}
 .body-text .s[data-r="7"]::after{background:var(--s7)}
 
-/* -- Sentence map ------------------------------------ */
+/* ── Sentence map ──────────────────────────────── */
 .smap{display:flex;gap:2px;border-radius:6px;overflow:hidden;margin-bottom:2rem}
 .smap-seg{
   flex:1;padding:8px 4px;text-align:center;cursor:pointer;
@@ -78,7 +78,7 @@ body{
 }
 .smap-seg:hover{opacity:.8}
 
-/* -- Figures gallery --------------------------------- */
+/* ── Figures gallery ───────────────────────────── */
 .figures-section{margin-bottom:3rem}
 .figures-section h2{
   font-family:system-ui,sans-serif;font-size:.7rem;font-weight:700;
@@ -97,7 +97,7 @@ body{
   color:var(--text2);border-top:1px solid var(--border)
 }
 
-/* -- App link ---------------------------------------- */
+/* ── App link ──────────────────────────────────── */
 .app-link-section{margin-bottom:3rem;text-align:center}
 .app-btn{
   display:inline-block;padding:12px 32px;background:var(--accent);color:#fff;
@@ -107,7 +107,7 @@ body{
 }
 .app-btn:hover{background:#6d5210}
 
-/* -- Notes ------------------------------------------- */
+/* ── Notes ─────────────────────────────────────── */
 .notes-section{
   background:var(--card);border-radius:8px;padding:1.5rem 1.8rem;
   margin-bottom:2.5rem
@@ -124,7 +124,7 @@ body{
 .notes-grid dd{font-size:.85rem;color:var(--text2)}
 .notes-grid dd a{color:var(--link);text-decoration:none;word-break:break-all}
 
-/* -- References -------------------------------------- */
+/* ── References ────────────────────────────────── */
 .refs-section{margin-bottom:2.5rem}
 .refs-section h2{
   font-family:system-ui,sans-serif;font-size:.7rem;font-weight:700;
@@ -136,7 +136,7 @@ body{
   padding-left:1.2rem;line-height:1.8
 }
 
-/* -- Disclosure -------------------------------------- */
+/* ── Disclosure ────────────────────────────────── */
 .disclosure{
   font-family:system-ui,sans-serif;font-size:.78rem;color:var(--text2);
   line-height:1.7;padding:1.2rem 1.5rem;background:var(--card);
@@ -144,7 +144,7 @@ body{
 }
 .disclosure strong{color:var(--text);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase}
 
-/* -- Footer ------------------------------------------ */
+/* ── Footer ────────────────────────────────────── */
 .footer{
   padding-top:1.5rem;border-top:1px solid var(--border);
   display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem
@@ -159,7 +159,7 @@ body{
 }
 .footer .actions button:hover{background:var(--card)}
 
-/* -- Print ------------------------------------------- */
+/* ── Print ─────────────────────────────────────── */
 @media print{
   .smap,.footer .actions,.app-link-section,.skip-link{display:none!important}
   .s::after{display:none!important}
@@ -170,7 +170,7 @@ body{
   .refs-section{page-break-before:auto}
 }
 
-/* -- Mobile ------------------------------------------ */
+/* ── Mobile ────────────────────────────────────── */
 @media(max-width:640px){
   .page{padding:1.5rem 1rem}
   .masthead h1{font-size:1.5rem}
@@ -184,7 +184,7 @@ body{
   .body-text{font-size:.95rem}
 }
 
-/* -- Skip link --------------------------------------- */
+/* ── Skip link ─────────────────────────────────── */
 .skip-link{
   position:absolute;top:-50px;left:0;background:#fff;padding:6px 12px;
   font-family:system-ui,sans-serif;font-size:.82rem;z-index:999;
@@ -192,7 +192,7 @@ body{
 }
 .skip-link:focus{top:8px;left:8px}
 
-/* -- Reduced motion ---------------------------------- */
+/* ── Reduced motion ────────────────────────────── */
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -252,12 +252,6 @@ body{
 <script>
 const D = {
   "title": "QualSynth: A Browser-Based Tool for Qualitative Evidence Synthesis with Meta-Ethnography and CERQual Assessment",
-  "slug": "qualsynth-qualitative-evidence-synthesis",
-  "author": "Mahmood Ahmad",
-  "affiliation": "Tahir Heart Institute",
-  "email": "author@example.com",
-  "date": "2026-04-01",
-  "body": "Can qualitative evidence synthesis encompassing meta-ethnography, thematic synthesis, and CERQual confidence assessment be performed entirely within a browser-based tool? QualSynth was demonstrated on two worked examples: type 2 diabetes self-management (five phenomenological and grounded theory studies, 132 participants) and healthcare worker burnout during COVID-19 (four studies, 103 participants). The tool implements a three-method pipeline comprising Noblit-Hare seven-phase meta-ethnography with reciprocal translation matrices, Thomas-Harden thematic synthesis generating descriptive-to-analytical theme hierarchies, and GRADE-CERQual four-component confidence assessment. Across both examples, QualSynth extracted 14 analytical themes with 87% thematic saturation, assigning CERQual confidence ratings of High (3 findings), Moderate (6 findings), Low (4 findings), and Very Low (1 finding). Translation matrix consistency scores ranged from 0.72 to 0.94, reliably identifying two refutational concepts requiring line-of-argument synthesis. QualSynth is the first browser-based qualitative evidence synthesis tool, eliminating dependence on NVivo or paper-based workflows for systematic reviewers. The current version does not include AI-assisted coding; theme identification and interpretation require human judgment.",
   "summary": "QualSynth implements meta-ethnography, thematic synthesis, and CERQual assessment in a browser, extracting 14 analytical themes at 87% saturation across two worked examples with consistency scores 0.72-0.94.",
   "type": "methods",
   "primary_estimand": "CERQual confidence rating",
@@ -272,27 +266,81 @@ const D = {
   "doi": "",
   "protocol": "",
   "source_article": "",
+  "body": "Can qualitative evidence synthesis encompassing meta-ethnography, thematic synthesis, and CERQual confidence assessment be performed entirely within a browser-based tool? QualSynth was demonstrated on two worked examples: type 2 diabetes self-management (five phenomenological and grounded theory studies, 132 participants) and healthcare worker burnout during COVID-19 (four studies, 103 participants). The tool implements a three-method pipeline comprising Noblit-Hare seven-phase meta-ethnography with reciprocal translation matrices, Thomas-Harden thematic synthesis generating descriptive-to-analytical theme hierarchies, and GRADE-CERQual four-component confidence assessment. Across both examples, QualSynth extracted 14 analytical themes with 87% thematic saturation, assigning CERQual confidence ratings of High (3 findings), Moderate (6 findings), Low (4 findings), and Very Low (1 finding). Translation matrix consistency scores ranged from 0.72 to 0.94, reliably identifying two refutational concepts requiring line-of-argument synthesis. QualSynth is the first browser-based qualitative evidence synthesis tool, eliminating dependence on NVivo or paper-based workflows for systematic reviewers. The current version does not include AI-assisted coding; theme identification and interpretation require human judgment.",
   "validation": {
-    "status": "pass",
+    "status": "fail",
     "checks": [
-      {"name": "single paragraph", "ok": true, "detail": "Body must not contain blank-line paragraph breaks."},
-      {"name": "sentence count", "ok": true, "detail": "Found 7 sentences."},
-      {"name": "word count", "ok": true, "detail": "Found 156 words."},
-      {"name": "no headings", "ok": true, "detail": "No markdown headings allowed in body."},
-      {"name": "no links", "ok": true, "detail": "No links or DOI links allowed in body."},
-      {"name": "result sentence has interval", "ok": true, "detail": "Sentence 4 should include a confidence interval."},
-      {"name": "result sentence has estimand", "ok": true, "detail": "Sentence 4 should name an effect measure or test metric."},
-      {"name": "boundary sentence present", "ok": true, "detail": "Sentence 7 should express a limitation, harm, or scope boundary."}
+      {
+        "name": "single paragraph",
+        "ok": true,
+        "detail": "Body must not contain blank-line paragraph breaks."
+      },
+      {
+        "name": "sentence count",
+        "ok": true,
+        "detail": "Found 7 sentences."
+      },
+      {
+        "name": "word count",
+        "ok": true,
+        "detail": "Found 156 words."
+      },
+      {
+        "name": "no headings",
+        "ok": true,
+        "detail": "No markdown headings allowed in body."
+      },
+      {
+        "name": "no links",
+        "ok": true,
+        "detail": "No links or DOI links allowed in body."
+      },
+      {
+        "name": "result sentence has interval",
+        "ok": true,
+        "detail": "Sentence 4 should include a quantitative result such as a percentage, count, or interval."
+      },
+      {
+        "name": "result sentence has estimand",
+        "ok": false,
+        "detail": "Sentence 4 should name an effect measure or test metric."
+      },
+      {
+        "name": "boundary sentence present",
+        "ok": true,
+        "detail": "Sentence 7 should express a limitation, harm, or scope boundary."
+      }
     ]
   },
   "sentences": [
-    {"role": "Question", "text": "Can qualitative evidence synthesis encompassing meta-ethnography, thematic synthesis, and CERQual confidence assessment be performed entirely within a browser-based tool?"},
-    {"role": "Dataset", "text": "QualSynth was demonstrated on two worked examples: type 2 diabetes self-management (five phenomenological and grounded theory studies, 132 participants) and healthcare worker burnout during COVID-19 (four studies, 103 participants)."},
-    {"role": "Method", "text": "The tool implements a three-method pipeline comprising Noblit-Hare seven-phase meta-ethnography with reciprocal translation matrices, Thomas-Harden thematic synthesis generating descriptive-to-analytical theme hierarchies, and GRADE-CERQual four-component confidence assessment."},
-    {"role": "Primary result", "text": "Across both examples, QualSynth extracted 14 analytical themes with 87% thematic saturation, assigning CERQual confidence ratings of High (3 findings), Moderate (6 findings), Low (4 findings), and Very Low (1 finding)."},
-    {"role": "Robustness", "text": "Translation matrix consistency scores ranged from 0.72 to 0.94, reliably identifying two refutational concepts requiring line-of-argument synthesis."},
-    {"role": "Interpretation", "text": "QualSynth is the first browser-based qualitative evidence synthesis tool, eliminating dependence on NVivo or paper-based workflows for systematic reviewers."},
-    {"role": "Boundary", "text": "The current version does not include AI-assisted coding; theme identification and interpretation require human judgment."}
+    {
+      "role": "Question",
+      "text": "Can qualitative evidence synthesis encompassing meta-ethnography, thematic synthesis, and CERQual confidence assessment be performed entirely within a browser-based tool?"
+    },
+    {
+      "role": "Dataset",
+      "text": "QualSynth was demonstrated on two worked examples: type 2 diabetes self-management (five phenomenological and grounded theory studies, 132 participants) and healthcare worker burnout during COVID-19 (four studies, 103 participants)."
+    },
+    {
+      "role": "Method",
+      "text": "The tool implements a three-method pipeline comprising Noblit-Hare seven-phase meta-ethnography with reciprocal translation matrices, Thomas-Harden thematic synthesis generating descriptive-to-analytical theme hierarchies, and GRADE-CERQual four-component confidence assessment."
+    },
+    {
+      "role": "Primary result",
+      "text": "Across both examples, QualSynth extracted 14 analytical themes with 87% thematic saturation, assigning CERQual confidence ratings of High (3 findings), Moderate (6 findings), Low (4 findings), and Very Low (1 finding)."
+    },
+    {
+      "role": "Robustness",
+      "text": "Translation matrix consistency scores ranged from 0.72 to 0.94, reliably identifying two refutational concepts requiring line-of-argument synthesis."
+    },
+    {
+      "role": "Interpretation",
+      "text": "QualSynth is the first browser-based qualitative evidence synthesis tool, eliminating dependence on NVivo or paper-based workflows for systematic reviewers."
+    },
+    {
+      "role": "Boundary",
+      "text": "The current version does not include AI-assisted coding; theme identification and interpretation require human judgment."
+    }
   ],
   "primary_plot": {},
   "studies": [],
@@ -300,15 +348,10 @@ const D = {
   "prisma": {},
   "included_papers": [],
   "analysis_modules": [],
-  "notes": {
-    "app": "QualSynth v1.0",
-    "data": "2 worked examples (T2DM self-management, HCW burnout)",
-    "code": "https://github.com/PLACEHOLDER/qualsynth",
-    "doi": "",
-    "version": "1.0",
-    "date": "2026-04-01",
-    "validation": "DRAFT"
-  },
+  "author": "Mahmood Ahmad",
+  "affiliation": "Tahir Heart Institute",
+  "email": "author@example.com",
+  "slug": "qualsynth-qualitative-evidence-synthesis",
   "references": [
     "Noblit GW, Hare RD. Meta-Ethnography: Synthesizing Qualitative Studies. Sage; 1988.",
     "Thomas J, Harden A. Methods for the thematic synthesis of qualitative research in systematic reviews. BMC Med Res Methodol. 2008;8:45.",
@@ -330,7 +373,7 @@ const ROLES = [
 
 function esc(s){const d=document.createElement("div");d.textContent=String(s??"");return d.innerHTML}
 
-// -- Title + byline --
+// ── Title + byline ──
 document.getElementById("title").textContent = D.title || "Untitled";
 document.title = (D.title||"E156") + " \u2014 E156 Interactive Paper";
 
@@ -341,7 +384,7 @@ if(D.email) parts.push('<a href="mailto:'+esc(D.email)+'">'+esc(D.email)+'</a>')
 if(D.date) parts.push(esc(D.date));
 document.getElementById("byline").innerHTML = parts.join(" &middot; ");
 
-// -- Body with sentence highlighting --
+// ── Body with sentence highlighting ──
 const body = D.body || "";
 const sents = D.sentences || [];
 const bodyEl = document.getElementById("body");
@@ -355,7 +398,7 @@ if(sents.length === 7){
   bodyEl.textContent = body;
 }
 
-// -- Sentence map --
+// ── Sentence map ──
 const smap = document.getElementById("smap");
 ROLES.forEach((r,i) => {
   const seg = document.createElement("div");
@@ -380,7 +423,7 @@ ROLES.forEach((r,i) => {
   smap.appendChild(seg);
 });
 
-// -- Figures from assets --
+// ── Figures from assets ──
 const assets = D._assets || [];
 const imgAssets = assets.filter(a => /\.(png|jpg|jpeg|svg|gif|webp)$/i.test(a));
 if(imgAssets.length > 0){
@@ -402,7 +445,7 @@ if(imgAssets.length > 0){
   });
 }
 
-// -- App link --
+// ── App link ──
 const htmlAssets = assets.filter(a => /\.html$/i.test(a) && a !== "index.html");
 if(htmlAssets.length > 0){
   document.getElementById("app-section").style.display = "";
@@ -412,7 +455,7 @@ if(htmlAssets.length > 0){
   btn.textContent = "Open Interactive App \u2192 " + htmlAssets[0].replace(/[-_]/g," ").replace(/\.html$/,"");
 }
 
-// -- Notes --
+// ── Notes ──
 const notes = D.notes || {};
 const noteFields = [
   ["Type", D.type], ["Primary Estimand", D.primary_estimand],
@@ -438,7 +481,7 @@ noteFields.forEach(([label, val]) => {
   ng.appendChild(dd);
 });
 
-// -- References --
+// ── References ──
 const refs = D.references || [];
 if(refs.length > 0){
   document.getElementById("refs-section").style.display = "";
@@ -450,19 +493,19 @@ if(refs.length > 0){
   });
 }
 
-// -- Disclosure --
+// ── Disclosure ──
 const disc = D._disclosure || "";
 if(disc){
   document.getElementById("disclosure").style.display = "";
   document.getElementById("disclosure-text").textContent = disc;
 }
 
-// -- Footer --
+// ── Footer ──
 const wc = body.split(/\s+/).filter(Boolean).length;
 document.getElementById("wc").textContent = wc;
 document.getElementById("wc-check").textContent = wc === 156 ? "\u2713" : "\u2717 ("+wc+")";
 
-// -- Actions --
+// ── Actions ──
 function copyBody(e){
   navigator.clipboard.writeText(body).then(()=>{
     const b=e&&e.target?e.target:document.querySelector(".actions button");
