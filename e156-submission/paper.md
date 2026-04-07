@@ -1,6 +1,6 @@
 Mahmood Ahmad
 Tahir Heart Institute
-author@example.com
+mahmood.ahmad2@nhs.net
 
 QualSynth: A Browser-Based Tool for Qualitative Evidence Synthesis with Meta-Ethnography and CERQual Assessment
 
