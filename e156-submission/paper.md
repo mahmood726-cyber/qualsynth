@@ -19,6 +19,6 @@ Validation: DRAFT
 
 References
 
-1. Noblit GW, Hare RD. Meta-Ethnography: Synthesizing Qualitative Studies. Sage; 1988.
-2. Thomas J, Harden A. Methods for the thematic synthesis of qualitative research in systematic reviews. BMC Med Res Methodol. 2008;8:45.
-3. Lewin S, Booth A, Munthe-Kaas H, et al. Applying GRADE-CERQual to qualitative evidence synthesis findings. Implement Sci. 2018;13(Suppl 1):25.
+1. Borenstein M, Hedges LV, Higgins JPT, Rothstein HR. Introduction to Meta-Analysis. 2nd ed. Wiley; 2021.
+2. Higgins JPT, Thompson SG, Deeks JJ, Altman DG. Measuring inconsistency in meta-analyses. BMJ. 2003;327(7414):557-560.
+3. Cochrane Handbook for Systematic Reviews of Interventions. Version 6.4. Cochrane; 2023.
