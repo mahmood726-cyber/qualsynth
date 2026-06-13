@@ -1,6 +1,6 @@
 # QualSynth
 
-World-first browser-based qualitative evidence synthesis tool supporting meta-ethnography (Noblit & Hare 1988), thematic synthesis (Thomas & Harden 2008), and CERQual confidence assessment (Lewin et al. 2018).
+A browser-based qualitative evidence synthesis tool supporting meta-ethnography (Noblit & Hare 1988), thematic synthesis (Thomas & Harden 2008), and CERQual confidence assessment (Lewin et al. 2018).
 
 ## Quick Start
 
@@ -48,12 +48,12 @@ data/
   diabetes.json     T2DM self-management example (5 studies)
   burnout.json      HCW burnout example (4 studies)
 
-tests/              27 pytest tests
+tests/              pytest suite (one test module per engine module)
 ```
 
 ## Validation
 
-All synthesis logic is implemented in both Python (testable) and JavaScript (interactive). The Python engine serves as the reference implementation with 27 automated tests covering themes, translation, CERQual, synthesis, and end-to-end pipeline.
+All synthesis logic is implemented in both Python (testable) and JavaScript (interactive). The Python engine serves as the reference implementation, with automated tests covering themes, translation, CERQual, synthesis, and the end-to-end pipeline.
 
 ## Citation
 
